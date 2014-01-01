@@ -27,4 +27,31 @@ all: $(TARGET)
 		--target=efi-app-$(ARCH) $^ $@
 
 clean:
-	rm -rf $(TARGET)
+	rm -rf $(TARGET) target
+
+.PHONY vboximage: target/disk.vdi
+
+target/disk.vdi: target/disk.img
+	if [ -a $@ ]; then rm $@; fi;
+	VBoxManage convertdd -format VDI --uuid "19fede09-2621-4fd8-8267-bb85e00936a6" $^ $@
+
+target/disk.img:
+	mkdir -p target
+	dd if=/dev/zero of=$@ bs=1M count=50
+	parted $@ mklabel gpt
+	parted -- $@ mkpart primary 1 -1
+	mkdosfs -F 12 $@
+
+MOUNT_DIR = mnt
+DEPLOY_DIR = $(MOUNT_DIR)/efi/boot
+
+mount:
+	mkdir -p $(MOUNT_DIR)
+	sudo mount -o loop,uid=1000 target/disk.img $(MOUNT_DIR)
+
+umount:
+	sudo umount $(MOUNT_DIR)
+
+deploy:
+	mkdir -p $(DEPLOY_DIR)
+	cp $(TARGET) $(DEPLOY_DIR)/bootx64.efi
