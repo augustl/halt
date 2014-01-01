@@ -43,7 +43,7 @@ target/disk.img:
 	mkdosfs -F 12 $@
 
 MOUNT_DIR = mnt
-DEPLOY_DIR = $(MOUNT_DIR)/efi/boot
+DEPLOY_DIR = $(MOUNT_DIR)/EFI/BOOT
 
 mount:
 	mkdir -p $(MOUNT_DIR)
@@ -54,4 +54,4 @@ umount:
 
 deploy:
 	mkdir -p $(DEPLOY_DIR)
-	cp $(TARGET) $(DEPLOY_DIR)/bootx64.efi
+	cp $(TARGET) $(DEPLOY_DIR)/BOOTx64.EFI
