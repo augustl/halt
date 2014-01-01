@@ -1,0 +1,13 @@
+# Hacking on HALT
+
+You can use the makefile to set up the base images needed for emulation.
+
+    make vboximage
+
+This creates a .img and a .vdi. If the .img exists, the .vdi will be recreated. To mount it up as a loopback device, run
+
+    make mount
+
+This mounts up the .img as loop in PROJECT_ROOT/mnt, meaning writing to that dir updates the .img directly. This makes it easy to deploy new builds of the kernel to the disk.
+
+Create a Virtualbox VM that has uefi enabled and boot from the .vdi disk created by the makefile.
