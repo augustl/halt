@@ -48,7 +48,7 @@ DEPLOY_DIR = $(MOUNT_DIR)/EFI/BOOT
 
 mount:
 	mkdir -p $(MOUNT_DIR)
-	sudo mount -o loop,uid=1000 target/disk.img $(MOUNT_DIR)
+	sudo mount -o loop,flush,uid=1000 target/disk.img $(MOUNT_DIR)
 
 umount:
 	sudo umount $(MOUNT_DIR)
