@@ -6,7 +6,7 @@ EFI_INCLUDE = /usr/include/efi
 EFI_INCLUDES = -I$(EFI_INCLUDE) -I$(EFI_INCLUDE)/$(ARCH) -I$(EFI_INCLUDE)/protocol -nostdinc
 EFI_LIBS := -lefi -lgnuefi $(shell $(CC) $(CFLAGS) -print-libgcc-file-name)
 
-CFLAGS = -Wall -g \
+CFLAGS = -Wall -Werror -g \
 	$(EFI_INCLUDES) \
 	-fno-stack-protector -fpic -fshort-wchar -mno-red-zone \
 	-DGNU_EFI_USE_MS_ABI -fPIC -maccumulate-outgoing-args -D$(ARCH)
