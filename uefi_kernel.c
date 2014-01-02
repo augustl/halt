@@ -23,13 +23,13 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
   SIMPLE_TEXT_OUTPUT_INTERFACE *conOut = systab->ConOut;
   conOut->OutputString(conOut, L"This is HALT!");
 
-  UINTN memoryMapKey;
-  if (EFI_ERROR(get_memory_map_key(systab, &memoryMapKey))) {
+  EFI_HANDLE runtimeImageHandler;
+  if (EFI_ERROR(load_runtime_image_handler(image, systab, &runtimeImageHandler))) {
     return EFI_LOAD_ERROR;
   }
 
-  EFI_HANDLE runtimeImageHandler;
-  if (EFI_ERROR(load_runtime_image_handler(image, systab, &runtimeImageHandler))) {
+  UINTN memoryMapKey;
+  if (EFI_ERROR(get_memory_map_key(systab, &memoryMapKey))) {
     return EFI_LOAD_ERROR;
   }
 
