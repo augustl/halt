@@ -11,7 +11,7 @@ EFI_STATUS get_memory_map_key(EFI_SYSTEM_TABLE *systab, UINTN *memoryMapKey) {
 
 EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
   SIMPLE_TEXT_OUTPUT_INTERFACE *conOut = systab->ConOut;
-  conOut->OutputString(conOut, L"This is HALT!");
+  conOut->OutputString(conOut, L"This is HALT!\r\n");
 
   UINTN memoryMapKey;
   if (EFI_ERROR(get_memory_map_key(systab, &memoryMapKey))) {
