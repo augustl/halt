@@ -38,7 +38,11 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
     return status;
   }
 
-  systab->BootServices->ExitBootServices(image, memoryMapKey);
+  status = systab->BootServices->ExitBootServices(image, memoryMapKey);
+  if (EFI_ERROR(status)) {
+    conOut->OutputString(conOut, L"There was an error exiting UEFI boot mode.\r\n");
+    return status;
+  }
 
   return EFI_SUCCESS;
 }
