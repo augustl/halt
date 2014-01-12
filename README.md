@@ -3,7 +3,7 @@
 Halt is a (work in progress) operating system.
 
 * H: Hardware. The OS does not aim to be close to today's hardware.
-* A: AST. Files are rich data structures, not dumb bytes.
+* A: Asynchronous. Blocking calls and threads is a horrible abstraction.
 * L: Lisp. The system language.
 * T: Time. All values will be immutable, giving us a good time model.
 
