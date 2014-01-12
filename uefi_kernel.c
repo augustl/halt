@@ -1,5 +1,4 @@
 #include <efi.h>
-#include <efilib.h>
 
 EFI_STATUS get_memory_map(EFI_SYSTEM_TABLE *systab, EFI_MEMORY_DESCRIPTOR *map, UINTN *key) {
   UINTN size = sizeof(EFI_MEMORY_DESCRIPTOR);
@@ -28,8 +27,6 @@ EFI_STATUS get_memory_map(EFI_SYSTEM_TABLE *systab, EFI_MEMORY_DESCRIPTOR *map, 
 #define MAX_EXIT_BOOT_RETRIES 4
 
 EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
-  InitializeLib(image, systab);
-
   EFI_STATUS status;
   SIMPLE_TEXT_OUTPUT_INTERFACE *con_out = systab->ConOut;
   con_out->OutputString(con_out, L"This is HALT!\r\n");
