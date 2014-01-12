@@ -18,12 +18,12 @@ EFI_STATUS get_memory_map(EFI_SYSTEM_TABLE *systab, EFI_MEMORY_DESCRIPTOR **map,
   }
   status = systab->BootServices->GetMemoryMap(&map_size, m, key, &descriptor_size, &descriptor_version);
   if (status == EFI_BUFFER_TOO_SMALL) {
-    systab->BootServices->FreePool(map);
+    systab->BootServices->FreePool(m);
     goto again;
   }
 
   if (status != EFI_SUCCESS) {
-    systab->BootServices->FreePool(map);
+    systab->BootServices->FreePool(m);
     goto fail;
   }
 
