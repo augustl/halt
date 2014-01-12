@@ -8,7 +8,7 @@ EFI_STATUS get_memory_map(EFI_SYSTEM_TABLE *systab, EFI_MEMORY_DESCRIPTOR **map,
   UINTN descriptor_size;
   UINT32 descriptor_version;
 
-  map_size = sizeof(*m);
+  map_size = sizeof(*m) * 32;
 
  again:
   map_size += sizeof(*m) * 2;
