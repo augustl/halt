@@ -42,7 +42,7 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
   int called_exit = 0;
  get_map:
   status = get_memory_map(systab, &memory_map, &memory_map_key);
-  if (EFI_ERROR(status)) {
+  if (status != EFI_SUCCESS) {
     con_out->OutputString(con_out, L"There was an error allocating memory map information.\r\n");
     goto free_mem_map;
     return status;
