@@ -1,29 +1,29 @@
 #include <efi.h>
 #include <efilib.h>
 
-EFI_STATUS get_memory_map_key(EFI_SYSTEM_TABLE *systab, UINTN *memory_map_key) {
+EFI_STATUS get_memory_map_key(EFI_SYSTEM_TABLE *systab, UINTN *key) {
   EFI_STATUS status;
-  UINTN memory_map_size = 0;
-  EFI_MEMORY_DESCRIPTOR *memory_map;
-  UINTN memory_map_descriptor_size;
-  UINT32 memory_map_descriptor_version;
+  UINTN map_size = 0;
+  EFI_MEMORY_DESCRIPTOR *map;
+  UINTN descriptor_size;
+  UINT32 descriptor_version;
 
-  status = systab->BootServices->GetMemoryMap(&memory_map_size, memory_map, memory_map_key, &memory_map_descriptor_size, &memory_map_descriptor_version);
+  status = systab->BootServices->GetMemoryMap(&map_size, map, key, &descriptor_size, &descriptor_version);
   if (status != EFI_BUFFER_TOO_SMALL) {
     return EFI_LOAD_ERROR;
   }
 
   // Spec says we should give it some additional space, since the allocation of the new buffer can
   // potentially increase the memory map size.
-  memory_map_size *= 1.25;
+  map_size *= 1.25;
 
-  status = systab->BootServices->AllocatePool(EfiLoaderData, memory_map_size, (void**)&memory_map);
+  status = systab->BootServices->AllocatePool(EfiLoaderData, map_size, (void**)&map);
   if (status != EFI_SUCCESS) {
-    systab->BootServices->FreePool(memory_map);
+    systab->BootServices->FreePool(map);
     return status;
   }
 
-  return systab->BootServices->GetMemoryMap(&memory_map_size, memory_map, memory_map_key, &memory_map_descriptor_size, &memory_map_descriptor_version);
+  return systab->BootServices->GetMemoryMap(&map_size, memory_map, key, &descriptor_size, &descriptor_version);
 }
 
 EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
