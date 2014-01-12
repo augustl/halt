@@ -2,23 +2,25 @@
 
 Halt is a (work in progress) operating system.
 
-* H: Hardware. The OS does not aim to be close to today's hardware.
+* H: Hardware. We don't care about mechanical sympathy for a specific architecture.
 * A: Asynchronous. Blocking calls and threads is a horrible abstraction.
 * L: Lisp. The system language.
 * T: Time. All values will be immutable, giving us a good time model.
 
-# Random thoughts
+# Not UNIX
 
-## Garbage collection
+Halt is not UNIX. The goal is to create something completely new.
 
-You do not manually allocate memory in HALT. All values are immutable values, implemented as persistent data structures. This means GC is required. However, how much synchronization do you need to GC when everything is immutable? None! A separate process (or even a separate core) can GC, without anyone ever knowing about it.
+# Immutability
 
-## Inter-process sharing
+All reads in the HALT userspace will return immutable values. Even things like the bytes representing the data for an IP packet. You will never be able to mutate a value. You will have things like atoms, that point to an immutable value, and can be changed to point to another immutable value. allowing you to model the world as a succession of immutable values. But most programs will have very few or no  atoms.
 
-How dangerous is it to share immutable values to other processes? None at all! Instead of COW structures with lots of overhead, we can just pass our values to other processes. Only writable state (in the form of an atim that points to an immutable value) needs protection.
+This means data can safely be shared across processes. The only thing that needs protection are the atoms. If you have a value and want another process/sandbox to see it, just pass it in. It's guaranteed by HALT to be immutable.
 
-## Business logic
+Garbage collection will also be interesting when everything is immutable. How much synchronization and stop-the-world do you need when all values are immutable? None at all!
 
-The goal is to have as much of the operating system logic as possible in the system language Lisp. Only a separate hardware abstraction layer (HAL) will be in C, that implements GC, data structures, etc. Things like TCP implementations, drivers, and so on, should be in Lisp. Because we don't want to tie the OS business logic to hardware.
+Process forking will also be easy. In traditional operating systems, very clever copy-on-write semantics make a fork no-op, memory will only be coped ince the parent or child process mutates it. When everything is immutable, though, the only thing that needs monitoring is the atoms. Since there will probably be few of them per process (in the low 100s), the plan for now is to just copy all the atoms on fork. Since everything else is immutable, no further copying should  be needed.
 
-This allows for hardware vendors to experiment as well. When all memory is immutable, perhaps something interesting can happen with memory architectures? In other words, some of the C code in HALT could be replaced with hardware implementations, of things like persistent data structures, GC, and what not.
+# Business logic
+
+The kernel should be as small as possible. The goal of the kernel is to abstract away today's hardware for the HALT runtime. As much as possible of the libraries and userspace should be implemented in Lisp, such as the IP stack.
