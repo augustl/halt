@@ -1,7 +1,7 @@
 #include <efi.h>
 
 EFI_STATUS get_memory_map(EFI_SYSTEM_TABLE *systab, EFI_MEMORY_DESCRIPTOR *map, UINTN *key) {
-  UINTN size = sizeof(EFI_MEMORY_DESCRIPTOR);
+  UINTN size = 0;
 
   EFI_STATUS status = EFI_LOAD_ERROR;
   while (status != EFI_SUCCESS) {
