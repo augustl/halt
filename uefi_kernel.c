@@ -32,6 +32,8 @@ EFI_STATUS get_memory_map(EFI_SYSTEM_TABLE *systab, EFI_MEMORY_DESCRIPTOR **map,
   return status;
 }
 
+#define MAX_EXIT_BOOT_RETRIES 10
+
 EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
   EFI_STATUS status;
   SIMPLE_TEXT_OUTPUT_INTERFACE *con_out = systab->ConOut;
@@ -39,7 +41,7 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
 
   UINTN memory_map_key;
   EFI_MEMORY_DESCRIPTOR *memory_map;
-  int called_exit = 0;
+  int num_retries = 0;
  get_map:
   status = get_memory_map(systab, &memory_map, &memory_map_key);
   if (status != EFI_SUCCESS) {
@@ -50,13 +52,13 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
 
   status = systab->BootServices->ExitBootServices(image, memory_map_key);
   if (status != EFI_SUCCESS) {
-    if (called_exit) {
+    if (num_retries == MAX_EXIT_BOOT_RETRIES) {
       goto free_mem_map;
     } else {
       // Only retrying once. The EFI spec says that upon first exit call, event handlers
       // might cause the memory map to change, and that this will only happen with the
       // first exit call.
-      called_exit = 1;
+      ++num_retries;
       systab->BootServices->FreePool(memory_map);
       goto get_map;
     }
