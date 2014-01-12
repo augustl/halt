@@ -23,18 +23,19 @@ EFI_STATUS get_memory_map(EFI_SYSTEM_TABLE *systab, EFI_MEMORY_DESCRIPTOR *map, 
   return status;
 }
 
-// Because 4 is a good random number! http://xkcd.com/221/
-#define MAX_EXIT_BOOT_RETRIES 4
+// We might fail the first time, due to ExitBootServices triggering callbacks
+// that alter the memory map. So we should only try twice.
+#define MAX_EXIT_BOOT_ATTEMPTS 2
 
 EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
   EFI_STATUS status;
   SIMPLE_TEXT_OUTPUT_INTERFACE *con_out = systab->ConOut;
   con_out->OutputString(con_out, L"This is HALT!\r\n");
 
-  int num_exit_boot_retries = 0;
+  int num_exit_boot_attempts = 0;
   status = EFI_LOAD_ERROR;
-  while (status != EFI_SUCCESS && num_exit_boot_retries < MAX_EXIT_BOOT_RETRIES) {
-    ++num_exit_boot_retries;
+  while (status != EFI_SUCCESS && num_exit_boot_attempts < MAX_EXIT_BOOT_ATTEMPTS) {
+    ++num_exit_boot_attempts;
 
     EFI_MEMORY_DESCRIPTOR *memory_map = NULL;
     UINTN memory_map_key;
