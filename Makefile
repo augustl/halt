@@ -14,7 +14,7 @@ CFLAGS = -Wall -Werror -g \
 LDFLAGS = -nostdlib -znocombreloc -T $(EFI_PATH)/elf_$(ARCH)_efi.lds -shared -Bsymbolic \
 	-L$(EFI_PATH) -L$(LIB_PATH) $(EFI_PATH)/crt0-efi-$(ARCH).o -lefi -lgnuefi
 
-TARGET = uefi_kernel.efi
+TARGET = uefi_bootloader.efi
 
 all: $(TARGET)
 
