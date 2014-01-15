@@ -17,7 +17,7 @@ All reads in the HALT userspace will return immutable values. Even things like t
 
 This means data can safely be shared across processes. The only thing that needs protection are the atoms. If you have a value and want another process/sandbox to see it, just pass it in. It's guaranteed by HALT to be immutable.
 
-Garbage collection will also be interesting when everything is immutable. Perhaps heap defragmentation without stop-the-world is possible?
+Garbage collection will also be interesting when everything is immutable. Typically stop-the-world is needed for heap defragmentation, but when everything is immutable, we should be able to e.g. copy a value to another place, then update the pointer, without having to stop the world, since it's immutable and safe to copy.
 
 Process forking will also be easy. In traditional operating systems, very clever copy-on-write semantics make a fork no-op, memory will only be coped ince the parent or child process mutates it. When everything is immutable, though, the only thing that needs monitoring is the atoms. Since there will probably be few of them per process (in the low 100s), the plan for now is to just copy all the atoms on fork. Since everything else is immutable, no further copying should  be needed.
 
