@@ -24,6 +24,26 @@ EFI_STATUS get_memory_map(EFI_SYSTEM_TABLE *systab, UINTN *size, EFI_MEMORY_DESC
   return status;
 }
 
+void print_memory_map(EFI_SYSTEM_TABLE *systab) {
+  EFI_STATUS status;
+  EFI_MEMORY_DESCRIPTOR *memory_map = NULL;
+  UINTN memory_map_key;
+  UINTN memmap_size;
+  UINTN memmap_desc_size;
+  UINT32 memmap_desc_version;
+
+  status = get_memory_map(systab, &memmap_size, &memory_map, &memory_map_key, &memmap_desc_size, &memmap_desc_version);
+  if (status == EFI_SUCCESS) {
+    void *p = memory_map;
+    void *end = p + memmap_size;
+    EFI_MEMORY_DESCRIPTOR *md;
+    for (; p < end; p += memmap_desc_size) {
+      md = p;
+      Print(L"--> memmap entry %d %ld %ld ", md->Type, md->NumberOfPages, md->Attribute);
+    }
+  }
+}
+
 // We might fail the first time, due to ExitBootServices triggering callbacks
 // that alter the memory map. So we should only try twice.
 #define MAX_EXIT_BOOT_ATTEMPTS 2
@@ -34,6 +54,7 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
   SIMPLE_TEXT_OUTPUT_INTERFACE *con_out = systab->ConOut;
   con_out->OutputString(con_out, L"This is HALT!\r\n");
 
+  print_memory_map(systab);
   int num_exit_boot_attempts = 0;
   status = EFI_LOAD_ERROR;
   while (status != EFI_SUCCESS && num_exit_boot_attempts < MAX_EXIT_BOOT_ATTEMPTS) {
