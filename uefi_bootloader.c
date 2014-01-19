@@ -39,7 +39,7 @@ void print_memory_map(EFI_SYSTEM_TABLE *systab) {
     EFI_MEMORY_DESCRIPTOR *md;
     for (; p < end; p += memmap_desc_size) {
       md = p;
-      Print(L"--> memmap entry %d %ld %ld ", md->Type, md->NumberOfPages, md->Attribute);
+      Print(L"--> memmap entry T:%d P:%ld V:%ld PGS:%ld AT:%ld ", md->Type, md->PhysicalStart, md->VirtualStart, md->NumberOfPages, md->Attribute);
     }
   }
 }
