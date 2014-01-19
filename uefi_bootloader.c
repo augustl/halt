@@ -1,23 +1,23 @@
 #include <efi.h>
 #include <efilib.h>
 
-EFI_STATUS get_memory_map(EFI_SYSTEM_TABLE *systab, EFI_MEMORY_DESCRIPTOR *map, UINTN *key) {
-  UINTN size = 0;
-
+EFI_STATUS get_memory_map(EFI_SYSTEM_TABLE *systab, UINTN *size, EFI_MEMORY_DESCRIPTOR **map, UINTN *key, UINTN *descriptor_size, UINT32 *descriptor_version) {
   EFI_STATUS status = EFI_LOAD_ERROR;
+  *size = 0;
+
   while (status != EFI_SUCCESS) {
     // Spec says we should give it some extra space.
-    size += sizeof(EFI_MEMORY_DESCRIPTOR) * 2;
+    *size += sizeof(EFI_MEMORY_DESCRIPTOR) * 2;
 
-    status = systab->BootServices->AllocatePool(EfiLoaderData, size, (void **)&map);
+    status = systab->BootServices->AllocatePool(EfiLoaderData, *size, (void **)map);
     if (status != EFI_SUCCESS) {
       // Allocation failed, assume that the world has ended.
       return status;
     }
 
-    status = systab->BootServices->GetMemoryMap(&size, map, key, NULL, NULL);
+    status = systab->BootServices->GetMemoryMap(size, *map, key, descriptor_size, descriptor_version);
     if (status != EFI_SUCCESS) {
-      systab->BootServices->FreePool(map);
+      systab->BootServices->FreePool(*map);
     }
   }
 
@@ -41,7 +41,8 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
 
     EFI_MEMORY_DESCRIPTOR *memory_map = NULL;
     UINTN memory_map_key;
-    status = get_memory_map(systab, memory_map, &memory_map_key);
+    UINTN memmap_size;
+    status = get_memory_map(systab, &memmap_size, &memory_map, &memory_map_key, NULL, NULL);
     if (status == EFI_SUCCESS) {
       status = systab->BootServices->ExitBootServices(image, memory_map_key);
     } else {
