@@ -56,20 +56,48 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
 
   print_memory_map(systab);
   int num_exit_boot_attempts = 0;
+  EFI_MEMORY_DESCRIPTOR *memory_map = NULL;
+  UINTN memory_map_key;
+  UINTN memmap_size;
+  UINTN memmap_desc_size;
+  UINT32 memmap_desc_version;
+
   status = EFI_LOAD_ERROR;
   while (status != EFI_SUCCESS && num_exit_boot_attempts < MAX_EXIT_BOOT_ATTEMPTS) {
     ++num_exit_boot_attempts;
 
-    EFI_MEMORY_DESCRIPTOR *memory_map = NULL;
-    UINTN memory_map_key;
-    UINTN memmap_size;
-    status = get_memory_map(systab, &memmap_size, &memory_map, &memory_map_key, NULL, NULL);
+    status = get_memory_map(systab, &memmap_size, &memory_map, &memory_map_key, &memmap_desc_size, &memmap_desc_version);
     if (status == EFI_SUCCESS) {
       status = systab->BootServices->ExitBootServices(image, memory_map_key);
     } else {
       systab->BootServices->FreePool(memory_map);
     }
   }
+
+  if (status == EFI_SUCCESS) {
+    void *p = memory_map;
+    EFI_MEMORY_DESCRIPTOR *md;
+    for (; p < p + memmap_size; p += memmap_desc_size) {
+      md = p;
+      switch (md->Type) {
+      case EfiLoaderCode:
+      case EfiLoaderData:
+        // The Loader and/or OS may use this memory as they see fit. Note: the OS loader that called ExitBootServices() is utilizing one or more EfiLoaderCode ranges.
+        break;
+      case EfiBootServicesCode:
+      case EfiBootServicesData:
+      case EfiConventionalMemory:
+        // Memory available for general use.
+        break;
+      default:
+        break;
+      }
+      // Print(L"--> memmap entry T:%d P:%ld V:%ld PGS:%ld AT:%ld ", md->Type, md->PhysicalStart, md->VirtualStart, md->NumberOfPages, md->Attribute);
+    }
+  }
+
+  // Don't just use the current memmap, we need to annotate it first in the loop above.
+  // systab->RuntimeServices->SetVirtualAddressMap(memmap_size, memmap_desc_size, memmap_desc_version, memory_map);
 
   return status;
 }
