@@ -50,6 +50,9 @@ mount:
 	mkdir -p $(MOUNT_DIR)
 	sudo mount -o loop,flush,uid=1000 target/disk.img $(MOUNT_DIR)
 
+.PHONY qemu:
+	qemu-system-x86_64 -L qemu-bios -serial stdio -cdrom target/disk.img -m 1024
+
 umount:
 	sudo umount $(MOUNT_DIR)
 
