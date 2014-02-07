@@ -49,6 +49,53 @@ void print_memory_map(EFI_SYSTEM_TABLE *systab) {
   Print(L"Total system memory: %ld\r\n", total_mem);
 }
 
+EFI_STATUS file_read_from_loaded_image_root(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab, CHAR16 *name, CHAR8 **data, UINTN *size) {
+  EFI_STATUS status;
+
+  EFI_LOADED_IMAGE *loaded_image;
+  status = systab->BootServices->OpenProtocol(image, &LoadedImageProtocol, (void **)&loaded_image, image, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
+  if (status != EFI_SUCCESS) {
+    return status;
+  }
+
+  EFI_FILE *root_dir;
+  root_dir = LibOpenRoot(loaded_image->DeviceHandle);
+  if (!root_dir) {
+    return EFI_LOAD_ERROR;
+  }
+
+  EFI_FILE_HANDLE handle;
+  status = root_dir->Open(root_dir, &handle, name, EFI_FILE_MODE_READ, 0);
+
+  if (status != EFI_SUCCESS) {
+    return status;
+  }
+
+  EFI_FILE_INFO *info;
+  UINTN file_size;
+  info = LibFileInfo(handle);
+  file_size = info->FileSize+1;
+  FreePool(info);
+
+  CHAR8 *file_data;
+  status = systab->BootServices->AllocatePool(EfiLoaderData, file_size, (void **)&file_data);
+  if (status != EFI_SUCCESS) {
+    return status;
+  }
+
+  status = handle->Read(handle, &file_size, file_data);
+  if (status != EFI_SUCCESS) {
+    FreePool(file_data);
+    return status;
+  }
+
+  handle->Close(handle);
+  file_data[file_size] = '\0';
+  *data = file_data;
+  *size = file_size;
+  return EFI_SUCCESS;
+}
+
 // We might fail the first time, due to ExitBootServices triggering callbacks
 // that alter the memory map. So we should only try twice.
 #define MAX_EXIT_BOOT_ATTEMPTS 2
@@ -60,6 +107,21 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
   con_out->OutputString(con_out, L"This is HALT!\r\n");
 
   print_memory_map(systab);
+
+
+  UINTN size;
+  CHAR16 *halt_image_location = L"\\halt\\halt.img";
+  CHAR8 *data = NULL;
+  status = file_read_from_loaded_image_root(image, systab, halt_image_location, &data, &size);
+  if (status != EFI_SUCCESS) {
+    Print(L"Unable to find HALT kernel image at ");
+    Print(halt_image_location);
+    Print(L"\r\n");
+    return status;
+  }
+
+  Print(L"Successfully located HALT kernel image (%ld bytes)\r\n", size);
+
   int num_exit_boot_attempts = 0;
   EFI_MEMORY_DESCRIPTOR *memory_map = NULL;
   UINTN memory_map_key;
