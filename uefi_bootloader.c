@@ -32,6 +32,8 @@ void print_memory_map(EFI_SYSTEM_TABLE *systab) {
   UINTN memmap_desc_size;
   UINT32 memmap_desc_version;
 
+  UINTN total_mem = 0;
+
   status = get_memory_map(systab, &memmap_size, &memory_map, &memory_map_key, &memmap_desc_size, &memmap_desc_version);
   if (status == EFI_SUCCESS) {
     void *p = memory_map;
@@ -39,9 +41,12 @@ void print_memory_map(EFI_SYSTEM_TABLE *systab) {
     EFI_MEMORY_DESCRIPTOR *md;
     for (; p < end; p += memmap_desc_size) {
       md = p;
-      Print(L"--> memmap entry T:%d P:%ld V:%ld PGS:%ld AT:%ld ", md->Type, md->PhysicalStart, md->VirtualStart, md->NumberOfPages, md->Attribute);
+      total_mem += md->NumberOfPages * 4096;
+      Print(L"memmap entry T:%d P:%ld V:%ld PGS:%ld AT:%ld \r\n", md->Type, md->PhysicalStart, md->VirtualStart, md->NumberOfPages, md->Attribute);
     }
   }
+
+  Print(L"Total system memory: %ld\r\n", total_mem);
 }
 
 // We might fail the first time, due to ExitBootServices triggering callbacks
