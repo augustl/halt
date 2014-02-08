@@ -45,17 +45,17 @@ target/disk.img:
 MOUNT_DIR = mnt
 DEPLOY_DIR = $(MOUNT_DIR)/EFI/BOOT
 
-mount:
+mount: target/disk.img
 	mkdir -p $(MOUNT_DIR)
 	sudo mount -o loop,flush,uid=1000 target/disk.img $(MOUNT_DIR)
 
 .PHONY qemu:
-	qemu-system-x86_64 -L qemu-bios -serial stdio -cdrom target/disk.img -m 1024
+	qemu-system-x86_64 -L qemu-bios -cdrom target/disk.img -m 1024 -vga none -monitor stdio
 
 umount:
 	sudo umount $(MOUNT_DIR)
 
-deploy:
+deploy: $(TARGET)
 	mkdir -p $(DEPLOY_DIR)
 	cp $(TARGET) $(DEPLOY_DIR)/BOOTx64.EFI
 
