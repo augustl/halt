@@ -11,3 +11,11 @@ This creates a .img and a .vdi. If the .img exists, the .vdi will be recreated. 
 This mounts up the .img as loop in PROJECT_ROOT/mnt, meaning writing to that dir updates the .img directly. This makes it easy to deploy new builds of the kernel to the disk.
 
 Create a Virtualbox VM that has uefi enabled and boot from the .vdi disk created by the makefile.
+
+## Virtualbox
+
+I wasn't able to run the image with Virtualbox 4.1.2 (Ubuntu 12.04), but it should be possible with VirtualBox 4.3.
+
+## Qemu
+
+In order to run the image with Qemu, download http://people.canonical.com/~jk/ovmf/ to folder qemu-bios.
