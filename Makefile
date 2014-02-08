@@ -16,16 +16,15 @@ LDFLAGS = -nostdlib -znocombreloc -T $(EFI_PATH)/elf_$(ARCH)_efi.lds -shared -Bs
 
 TARGET = uefi_bootloader.efi
 
+SECTIONS = .text .sdata .data .dynamic .dynsym .rel .rela .reloc .eh_frame
+
 all: $(TARGET)
 
 %.so: %.o
 	$(LD) -o $@ $(LDFLAGS) $^ $(EFI_LIBS)
 
 %.efi: %.so
-	objcopy -j .text -j .sdata -j .data \
-		-j .dynamic -j .dynsym -j .rel \
-		-j .rela -j .reloc -j .eh_frame \
-		--target=efi-app-$(ARCH) $^ $@
+	objcopy $(foreach sec,$(SECTIONS),-j $(sec)) --target=efi-app-$(ARCH) $^ $@
 
 clean:
 	rm -rf $(TARGET) target
