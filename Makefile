@@ -60,4 +60,4 @@ deploy:
 	mkdir -p $(DEPLOY_DIR)
 	cp $(TARGET) $(DEPLOY_DIR)/BOOTx64.EFI
 
-build: all deploy vboximage
+build: all target/disk.img mount deploy umount vboximage
