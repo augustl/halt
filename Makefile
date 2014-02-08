@@ -33,7 +33,7 @@ clean:
 .PHONY vboximage: target/disk.vdi
 
 target/disk.vdi: target/disk.img
-	if [ -a $@ ]; then rm $@; fi;
+	if [ -f $@ ]; then rm $@; fi;
 	VBoxManage convertdd -format VDI --uuid "19fede09-2621-4fd8-8267-bb85e00936a6" $^ $@
 
 target/disk.img:
