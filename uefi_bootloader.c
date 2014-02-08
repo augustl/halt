@@ -66,7 +66,6 @@ EFI_STATUS file_read_from_loaded_image_root(EFI_HANDLE image, EFI_SYSTEM_TABLE *
 
   EFI_FILE_HANDLE handle;
   status = root_dir->Open(root_dir, &handle, name, EFI_FILE_MODE_READ, 0);
-
   if (status != EFI_SUCCESS) {
     return status;
   }
@@ -74,7 +73,7 @@ EFI_STATUS file_read_from_loaded_image_root(EFI_HANDLE image, EFI_SYSTEM_TABLE *
   EFI_FILE_INFO *info;
   UINTN file_size;
   info = LibFileInfo(handle);
-  file_size = info->FileSize+1;
+  file_size = info->FileSize;
   FreePool(info);
 
   CHAR8 *file_data;
@@ -90,7 +89,6 @@ EFI_STATUS file_read_from_loaded_image_root(EFI_HANDLE image, EFI_SYSTEM_TABLE *
   }
 
   handle->Close(handle);
-  file_data[file_size] = '\0';
   *data = file_data;
   *size = file_size;
   return EFI_SUCCESS;
