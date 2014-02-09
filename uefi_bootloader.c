@@ -24,6 +24,27 @@ EFI_STATUS get_memory_map(EFI_SYSTEM_TABLE *systab, UINTN *size, EFI_MEMORY_DESC
   return status;
 }
 
+CHAR16* get_memory_map_type_string(UINT32 type) {
+  switch (type) {
+  case EfiReservedMemoryType: return L"EfiReservedMemoryType";
+  case EfiLoaderCode: return L"EfiLoaderCode";
+  case EfiLoaderData: return L"EfiLoaderData";
+  case EfiBootServicesCode: return L"EfiBootServicesCode";
+  case EfiBootServicesData: return L"EfiBootServicesData";
+  case EfiRuntimeServicesCode: return L"EfiRuntimeServicesCode";
+  case EfiRuntimeServicesData: return L"EfiRuntimeServicesData";
+  case EfiConventionalMemory: return L"EfiConventionalMemory";
+  case EfiUnusableMemory: return L"EfiUnusableMemory";
+  case EfiACPIReclaimMemory: return L"EfiACPIReclaimMemory";
+  case EfiACPIMemoryNVS: return L"EfiACPIMemoryNVS";
+  case EfiMemoryMappedIO: return L"EfiMemoryMappedIO";
+  case EfiMemoryMappedIOPortSpace: return L"EfiMemoryMappedIOPortSpace";
+  case EfiPalCode: return L"EfiPalCode";
+  case EfiMaxMemoryType: return L"EfiMaxMemoryType";
+  default: return L"UNKNOWN";
+  }
+}
+
 void print_memory_map(EFI_SYSTEM_TABLE *systab) {
   EFI_STATUS status;
   EFI_MEMORY_DESCRIPTOR *memory_map = NULL;
@@ -42,7 +63,7 @@ void print_memory_map(EFI_SYSTEM_TABLE *systab) {
     for (; p < end; p += memmap_desc_size) {
       md = p;
       total_mem += md->NumberOfPages * 4096;
-      Print(L"memmap entry T:%d P:%ld V:%ld PGS:%ld AT:%ld \r\n", md->Type, md->PhysicalStart, md->VirtualStart, md->NumberOfPages, md->Attribute);
+      Print(L"memmap entry T:%s P:%ld V:%ld PGS:%ld AT:%ld \r\n", get_memory_map_type_string(md->Type), md->PhysicalStart, md->VirtualStart, md->NumberOfPages, md->Attribute);
     }
   }
 
@@ -66,7 +87,6 @@ EFI_STATUS file_read_from_loaded_image_root(EFI_HANDLE image, EFI_SYSTEM_TABLE *
 
   EFI_FILE_HANDLE handle;
   status = root_dir->Open(root_dir, &handle, name, EFI_FILE_MODE_READ, 0);
-
   if (status != EFI_SUCCESS) {
     return status;
   }
@@ -74,7 +94,7 @@ EFI_STATUS file_read_from_loaded_image_root(EFI_HANDLE image, EFI_SYSTEM_TABLE *
   EFI_FILE_INFO *info;
   UINTN file_size;
   info = LibFileInfo(handle);
-  file_size = info->FileSize+1;
+  file_size = info->FileSize;
   FreePool(info);
 
   CHAR8 *file_data;
@@ -90,7 +110,6 @@ EFI_STATUS file_read_from_loaded_image_root(EFI_HANDLE image, EFI_SYSTEM_TABLE *
   }
 
   handle->Close(handle);
-  file_data[file_size] = '\0';
   *data = file_data;
   *size = file_size;
   return EFI_SUCCESS;
