@@ -103,8 +103,7 @@ EFI_STATUS file_read_from_loaded_image_root(EFI_HANDLE image, EFI_SYSTEM_TABLE *
 EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
   InitializeLib(image, systab);
   EFI_STATUS status;
-  SIMPLE_TEXT_OUTPUT_INTERFACE *con_out = systab->ConOut;
-  con_out->OutputString(con_out, L"This is HALT!\r\n");
+  Print(L"This is HALT!\r\n");
 
   print_memory_map(systab);
 
