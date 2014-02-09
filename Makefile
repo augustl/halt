@@ -63,7 +63,7 @@ mount: $(TARGET_DISK)
 		sudo mount -o loop,flush,uid=1000 target/disk.img $(MOUNT_DIR); \
 	fi;
 
-QEMU_OPTIONS = -L qemu-bios -cdrom target/disk.img -m 1024 -vga none -monitor stdio
+QEMU_OPTIONS = -L qemu-bios -cdrom target/disk.img -m 1024 -vga none -serial stdio
 QEMU_DEBUG_OPTIONS = -s
 
 qemu: deploy
