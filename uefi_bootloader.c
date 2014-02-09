@@ -45,7 +45,22 @@ CHAR16* get_memory_map_type_string(UINT32 type) {
   }
 }
 
-void print_memory_map(EFI_SYSTEM_TABLE *systab) {
+void print_memory_map(EFI_MEMORY_DESCRIPTOR *memory_map, UINTN memmap_size, UINTN memmap_desc_size) {
+  UINTN total_mem = 0;
+
+  void *p = memory_map;
+  void *end = p + memmap_size;
+  EFI_MEMORY_DESCRIPTOR *md;
+  for (; p < end; p += memmap_desc_size) {
+    md = p;
+    total_mem += md->NumberOfPages * 4096;
+    Print(L"memmap entry T:%s P:%ld V:%ld PGS:%ld AT:%ld \r\n", get_memory_map_type_string(md->Type), md->PhysicalStart, md->VirtualStart, md->NumberOfPages, md->Attribute);
+  }
+
+  Print(L"Total map memory: %ld\r\n", total_mem);
+}
+
+void print_current_memory_map(EFI_SYSTEM_TABLE *systab) {
   EFI_STATUS status;
   EFI_MEMORY_DESCRIPTOR *memory_map = NULL;
   UINTN memory_map_key;
@@ -53,21 +68,10 @@ void print_memory_map(EFI_SYSTEM_TABLE *systab) {
   UINTN memmap_desc_size;
   UINT32 memmap_desc_version;
 
-  UINTN total_mem = 0;
-
   status = get_memory_map(systab, &memmap_size, &memory_map, &memory_map_key, &memmap_desc_size, &memmap_desc_version);
   if (status == EFI_SUCCESS) {
-    void *p = memory_map;
-    void *end = p + memmap_size;
-    EFI_MEMORY_DESCRIPTOR *md;
-    for (; p < end; p += memmap_desc_size) {
-      md = p;
-      total_mem += md->NumberOfPages * 4096;
-      Print(L"memmap entry T:%s P:%ld V:%ld PGS:%ld AT:%ld \r\n", get_memory_map_type_string(md->Type), md->PhysicalStart, md->VirtualStart, md->NumberOfPages, md->Attribute);
-    }
+    print_memory_map(memory_map, memmap_size, memmap_desc_size);
   }
-
-  Print(L"Total system memory: %ld\r\n", total_mem);
 }
 
 EFI_STATUS file_read_from_loaded_image_root(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab, CHAR16 *name, CHAR8 **data, UINTN *size) {
@@ -124,7 +128,7 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
   EFI_STATUS status;
   Print(L"This is HALT!\r\n");
 
-  print_memory_map(systab);
+  print_current_memory_map(systab);
 
 
   UINTN size;
