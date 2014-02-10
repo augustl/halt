@@ -124,6 +124,46 @@ EFI_STATUS file_read_from_loaded_image_root(EFI_HANDLE image, EFI_SYSTEM_TABLE *
   return EFI_SUCCESS;
 }
 
+static void memcpy(void *dest, const void *src, UINTN count) {
+  char* dst8 = (char*)dest;
+  char* src8 = (char*)src;
+
+  while (count--) {
+    *dst8++ = *src8++;
+  }
+}
+
+static int is_mergeable_type(UINT32 type) {
+  return type == EfiBootServicesCode || type == EfiBootServicesData || type == EfiConventionalMemory;
+}
+
+static void merge_memory_map(EFI_MEMORY_DESCRIPTOR *memory_map, UINTN *memmap_size, UINTN memmap_desc_size) {
+  void *p = memory_map;
+  void *memmap_end = p + *memmap_size;
+  EFI_MEMORY_DESCRIPTOR *md = NULL;
+  EFI_MEMORY_DESCRIPTOR *prev_md = memory_map;
+  EFI_MEMORY_DESCRIPTOR *curr_new_md = memory_map;
+  p += memmap_desc_size;
+  for (; p < memmap_end; p += memmap_desc_size) {
+    md = p;
+
+    if (is_mergeable_type(prev_md->Type) && is_mergeable_type(md->Type) &&
+        prev_md->Attribute == prev_md->Attribute) {
+      curr_new_md->Type = EfiConventionalMemory;
+      curr_new_md->NumberOfPages += md->NumberOfPages;
+      *memmap_size -= memmap_desc_size;
+    } else {
+      void *curr_p = curr_new_md;
+      curr_p += memmap_desc_size;
+      curr_new_md = curr_p;
+      memcpy(curr_p, p, memmap_desc_size);
+    }
+
+    prev_md = md;
+  }
+
+}
+
 // We might fail the first time, due to ExitBootServices triggering callbacks
 // that alter the memory map. So we should only try twice.
 #define MAX_EXIT_BOOT_ATTEMPTS 2
@@ -168,30 +208,11 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
     }
   }
 
-  if (status == EFI_SUCCESS) {
-    void *p = memory_map;
-    EFI_MEMORY_DESCRIPTOR *md;
-    for (; p < p + memmap_size; p += memmap_desc_size) {
-      md = p;
-      switch (md->Type) {
-      case EfiLoaderCode:
-      case EfiLoaderData:
-        // The Loader and/or OS may use this memory as they see fit. Note: the OS loader that called ExitBootServices() is utilizing one or more EfiLoaderCode ranges.
-        break;
-      case EfiBootServicesCode:
-      case EfiBootServicesData:
-      case EfiConventionalMemory:
-        // Memory available for general use.
-        break;
-      default:
-        break;
-      }
-      // Print(L"--> memmap entry T:%d P:%ld V:%ld PGS:%ld AT:%ld ", md->Type, md->PhysicalStart, md->VirtualStart, md->NumberOfPages, md->Attribute);
-    }
+  if (status != EFI_SUCCESS) {
+    return status;
   }
 
-  // Don't just use the current memmap, we need to annotate it first in the loop above.
-  // systab->RuntimeServices->SetVirtualAddressMap(memmap_size, memmap_desc_size, memmap_desc_version, memory_map);
-
-  return status;
+  merge_memory_map(memory_map, &memmap_size, memmap_desc_size);
+  systab->RuntimeServices->SetVirtualAddressMap(memmap_size, memmap_desc_size, memmap_desc_version, memory_map);
+  return EFI_SUCCESS;
 }

@@ -8,7 +8,7 @@ EFI_LIBS := -lefi -lgnuefi $(shell $(CC) $(CFLAGS) -print-libgcc-file-name)
 
 CFLAGS = -Wall -Werror -g \
 	$(EFI_INCLUDES) \
-	-fno-stack-protector -fpic -fshort-wchar -mno-red-zone \
+	-fno-stack-protector -fpic -fshort-wchar -mno-red-zone -fno-builtin \
 	-DGNU_EFI_USE_MS_ABI -fPIC -maccumulate-outgoing-args -D$(ARCH)
 
 LDFLAGS = -nostdlib -znocombreloc -T $(EFI_PATH)/elf_$(ARCH)_efi.lds -shared -Bsymbolic \
