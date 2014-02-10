@@ -45,6 +45,10 @@ CHAR16* get_memory_map_type_string(UINT32 type) {
   }
 }
 
+void print_memory_descriptor(EFI_MEMORY_DESCRIPTOR *md) {
+  Print(L"memmap entry T:%s P:%ld V:%ld PGS:%ld AT:%ld", get_memory_map_type_string(md->Type), md->PhysicalStart, md->VirtualStart, md->NumberOfPages, md->Attribute);
+}
+
 void print_memory_map(EFI_MEMORY_DESCRIPTOR *memory_map, UINTN memmap_size, UINTN memmap_desc_size) {
   UINTN total_mem = 0;
 
@@ -54,7 +58,8 @@ void print_memory_map(EFI_MEMORY_DESCRIPTOR *memory_map, UINTN memmap_size, UINT
   for (; p < end; p += memmap_desc_size) {
     md = p;
     total_mem += md->NumberOfPages * 4096;
-    Print(L"memmap entry T:%s P:%ld V:%ld PGS:%ld AT:%ld \r\n", get_memory_map_type_string(md->Type), md->PhysicalStart, md->VirtualStart, md->NumberOfPages, md->Attribute);
+    print_memory_descriptor(md);
+    Print(L"\r\n");
   }
 
   Print(L"Total map memory: %ld\r\n", total_mem);
