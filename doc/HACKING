@@ -4,6 +4,10 @@ First, make the virtual disk.
 
     ./script/make_disk
 
+Mount this disk in loop so that you can write to a plain folder to write to the disk.
+
+    ./script/mount
+
 Then, build and deploy the uefi bootloader and HALT.
 
     ./script/all
