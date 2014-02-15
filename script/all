@@ -2,6 +2,8 @@
 
 . script/_env.sh
 
+ensure_mount
+
 BOOTLOADER_DIR="EFI/BOOT"
 
 cd uefi_bootloader
