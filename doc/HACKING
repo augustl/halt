@@ -1,16 +1,19 @@
 # Hacking on HALT
 
-You can use the makefile to set up the base images needed for emulation.
+First, make the virtual disk.
 
-    make vboximage
+    ./script/make_disk
 
-This creates a .img and a .vdi. If the .img exists, the .vdi will be recreated. To mount it up as a loopback device, run
+Then, build and deploy the uefi bootloader and HALT.
 
-    make mount
+    ./script/all
 
-This mounts up the .img as loop in PROJECT_ROOT/mnt, meaning writing to that dir updates the .img directly. This makes it easy to deploy new builds of the kernel to the disk.
+Use qemu to  boot it all up:
 
-Create a Virtualbox VM that has uefi enabled and boot from the .vdi disk created by the makefile.
+    ./script/qemu_bios  # You only need to run it once
+    ./script/qemu
+
+Happy hacking!
 
 ## Virtualbox
 
