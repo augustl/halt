@@ -1,0 +1,5 @@
+#!/bin/sh
+
+. script/_env.sh
+
+VBoxManage convertdd -format VDI --uuid $HALT_VBOX_UUID $TARGET_DISK target/virtual_disk.vdi

@@ -1,0 +1,11 @@
+#!/bin/sh
+
+. script/_env.sh
+
+BOOTLOADER_DIR="EFI/BOOT"
+
+cd uefi_bootloader
+make
+cd ..
+mkdir -p mnt/$BOOTLOADER_DIR
+cp uefi_bootloader/uefi_bootloader.efi mnt/$BOOTLOADER_DIR/BOOTx64.EFI

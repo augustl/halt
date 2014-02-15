@@ -1,0 +1,6 @@
+#!/bin/sh
+
+. script/_env.sh
+
+QEMU_OPTIONS="-L qemu-bios -cdrom $TARGET_DISK -m 1024 -vga none -serial stdio"
+qemu-system-x86_64 $QEMU_OPTIONS
