@@ -19,12 +19,14 @@ Use qemu to  boot it all up:
 
 Happy hacking!
 
-## Virtualbox
-
-I wasn't able to run the image with Virtualbox 4.1.2 (Ubuntu 12.04), but it should be possible with VirtualBox 4.3.
-
 ## Qemu
 
-In order to run the image with Qemu, download http://people.canonical.com/~jk/ovmf/ to folder qemu-bios.
+In order to run the image with Qemu, use http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=OVMF. Rename OVMF.fd to bios.bin, and CirrusLogic5446.rom to vgabios-cirrus.bin. Put them both in qemu-bios.
 
-Alternatively, use http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=OVMF. Rename OVMF.fd to bios.bin, and CirrusLogic5446.rom to vgabios-cirrus.bin. Put them both in qemu-bios.
+Run with
+
+    make qemu
+
+## GCC
+
+There is a gotcha. You need gcc >= 4.7, otherwise the `-DGNU_EFI_USE_MS_ABI` flag won't work and the calls to BootServices will end up with errors.
