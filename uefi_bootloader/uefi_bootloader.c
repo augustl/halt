@@ -209,6 +209,7 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
   }
 
   if (status != EFI_SUCCESS) {
+    Print(L"Failed to exit boot services\r\n");
     return status;
   }
 
