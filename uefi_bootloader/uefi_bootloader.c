@@ -214,6 +214,7 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
   }
 
   merge_memory_map(memory_map, &memmap_size, memmap_desc_size);
-  systab->RuntimeServices->SetVirtualAddressMap(memmap_size, memmap_desc_size, memmap_desc_version, memory_map);
+  // Figure out if/why we actually need to do this.
+  // systab->RuntimeServices->SetVirtualAddressMap(memmap_size, memmap_desc_size, memmap_desc_version, memory_map);
   return EFI_SUCCESS;
 }
