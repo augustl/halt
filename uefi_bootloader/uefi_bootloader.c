@@ -176,10 +176,10 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
   print_current_memory_map(systab);
 
 
-  UINTN size;
+  UINTN halt_image_size;
   CHAR16 *halt_image_location = L"\\halt\\halt_kernel.elf";
-  CHAR8 *data = NULL;
-  status = file_read_from_loaded_image_root(image, systab, halt_image_location, &data, &size);
+  CHAR8 *halt_image_data = NULL;
+  status = file_read_from_loaded_image_root(image, systab, halt_image_location, &halt_image_data, &halt_image_size);
   if (status != EFI_SUCCESS) {
     Print(L"Unable to find HALT kernel image at ");
     Print(halt_image_location);
@@ -187,7 +187,7 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
     return status;
   }
 
-  Print(L"Successfully located HALT kernel image (%ld bytes)\r\n", size);
+  Print(L"Successfully located HALT kernel image (%ld bytes)\r\n", halt_image_size);
 
   int num_exit_boot_attempts = 0;
   EFI_MEMORY_DESCRIPTOR *memory_map = NULL;
