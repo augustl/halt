@@ -1,0 +1,9 @@
+#!/bin/sh
+
+ARCH=x86_64
+
+mkdir -p target
+nasm -felf64 src/kernel_entry.asm -o target/kernel_entry.o
+gcc -c src/kernel_main.c -o target/kernel_main.o -std=gnu99 -ffreestanding -O2 -D$ARCH -Wall -Werror -Wextra
+# i586-elf-gcc -T linker.ld -o myos.bin -ffreestanding -O2 -nostdlib boot.o kernel.o -lgcc
+gcc -T src/linker.ld -o target/kernel.bin -ffreestanding -O2 -nostdlib target/kernel_entry.o target/kernel_main.o

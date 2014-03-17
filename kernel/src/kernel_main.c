@@ -1,0 +1,2 @@
+void kernel_main() {
+}

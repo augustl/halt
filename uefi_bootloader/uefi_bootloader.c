@@ -177,7 +177,7 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
 
 
   UINTN size;
-  CHAR16 *halt_image_location = L"\\halt\\halt.img";
+  CHAR16 *halt_image_location = L"\\halt\\halt_kernel.elf";
   CHAR8 *data = NULL;
   status = file_read_from_loaded_image_root(image, systab, halt_image_location, &data, &size);
   if (status != EFI_SUCCESS) {
