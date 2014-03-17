@@ -1,13 +1,12 @@
-section .bootstrap_stack
-align 4
-stack_bottom:
-times 16384 db 0
-stack_top:
-
 section .text
 global _start
 _start:
-        mov esp, stack_top
+        ; Note: next step is to get data structure from eax and find
+        ; a suitable location in memory for the kernel stack. Then call
+        ; kernel.
+        ; mov esp, the_stack_location
+        ; extern kernel_main
+        ; call kernel_main
         cli
 .hang:
         hlt
