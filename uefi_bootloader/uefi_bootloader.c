@@ -216,5 +216,21 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
   merge_memory_map(memory_map, &memmap_size, memmap_desc_size);
   // Figure out if/why we actually need to do this.
   // systab->RuntimeServices->SetVirtualAddressMap(memmap_size, memmap_desc_size, memmap_desc_version, memory_map);
+
+  EFI_MEMORY_DESCRIPTOR *first_memmap_item = memory_map;
+  if (first_memmap_item->PhysicalStart != 0) {
+    return EFI_LOAD_ERROR;
+  }
+
+  UINTN first_segment_num_bytes = first_memmap_item->NumberOfPages * 4096;
+  UINTN halt_init_struct_size = 4096; // We don't yet know the actual size.
+  if (first_segment_num_bytes < halt_image_size + halt_init_struct_size) {
+    return EFI_LOAD_ERROR;
+  }
+
+  memcpy(0, halt_image_data, halt_image_size);
+  // At this point, I need to learn how to use gdb so I can check that the contents
+  // of the kernel image are actually present in 0x00000000.
+
   return EFI_SUCCESS;
 }
