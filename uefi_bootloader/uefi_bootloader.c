@@ -79,14 +79,8 @@ void print_current_memory_map(EFI_SYSTEM_TABLE *systab) {
   }
 }
 
-EFI_STATUS file_read_from_loaded_image_root(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab, CHAR16 *name, CHAR8 **data, UINTN *size) {
+EFI_STATUS file_read_from_loaded_image_root(EFI_LOADED_IMAGE *loaded_image, EFI_SYSTEM_TABLE *systab, CHAR16 *name, CHAR8 **data, UINTN *size) {
   EFI_STATUS status;
-
-  EFI_LOADED_IMAGE *loaded_image;
-  status = systab->BootServices->OpenProtocol(image, &LoadedImageProtocol, (void **)&loaded_image, image, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
-  if (status != EFI_SUCCESS) {
-    return status;
-  }
 
   EFI_FILE *root_dir;
   root_dir = LibOpenRoot(loaded_image->DeviceHandle);
@@ -175,11 +169,18 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
 
   print_current_memory_map(systab);
 
+  EFI_LOADED_IMAGE *loaded_image;
+  status = systab->BootServices->OpenProtocol(image, &LoadedImageProtocol, (void **)&loaded_image, image, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
+  if (status != EFI_SUCCESS) {
+    return status;
+  }
+
+  Print(L"Boot loader base: 0x%lx\r\n", loaded_image->ImageBase);
 
   UINTN halt_image_size;
   CHAR16 *halt_image_location = L"\\halt\\halt_kernel.elf";
   CHAR8 *halt_image_data = NULL;
-  status = file_read_from_loaded_image_root(image, systab, halt_image_location, &halt_image_data, &halt_image_size);
+  status = file_read_from_loaded_image_root(loaded_image, systab, halt_image_location, &halt_image_data, &halt_image_size);
   if (status != EFI_SUCCESS) {
     Print(L"Unable to find HALT kernel image at ");
     Print(halt_image_location);
