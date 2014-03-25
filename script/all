@@ -5,9 +5,15 @@
 ensure_mount
 
 BOOTLOADER_DIR="EFI/BOOT"
+KERNEL_DIR="halt"
 
 cd uefi_bootloader
 make
 cd ..
 mkdir -p target/mnt/$BOOTLOADER_DIR
 cp uefi_bootloader/uefi_bootloader.efi target/mnt/$BOOTLOADER_DIR/BOOTx64.EFI
+cd kernel
+./script/build
+cd ..
+mkdir -p target/mnt/$KERNEL_DIR
+cp kernel/target/kernel.elf target/mnt/$KERNEL_DIR/halt_kernel.elf
