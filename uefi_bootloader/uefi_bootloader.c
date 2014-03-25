@@ -233,5 +233,10 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
   // At this point, I need to learn how to use gdb so I can check that the contents
   // of the kernel image are actually present in 0x00000000.
 
+  int wait = 1;
+  while (wait) {
+    __asm__ __volatile__("pause");
+  }
+
   return EFI_SUCCESS;
 }
