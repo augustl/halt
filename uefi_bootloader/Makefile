@@ -22,6 +22,8 @@ DEBUG_SECTIONS = .debug_info .debug_abbrev .debug_loc .debug_aranges \
 
 all: $(TARGET)
 
+debug: uefi_bootloader-debug.efi
+
 %.so: %.o
 	$(LD) -o $@ $(LDFLAGS) $^ $(EFI_LIBS)
 
