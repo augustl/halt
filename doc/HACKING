@@ -34,7 +34,7 @@ Based heavily on http://wiki.osdev.org/UEFI#Using_GNU_toolchain_for_compiling_an
 First, create the debug boot loader.
 
     cd uefi_bootloader/
-    make uefi_bootloader-debug.efi
+    make debug
 
 Run with
 
@@ -42,47 +42,9 @@ Run with
 
 In another tab, run
 
-    gdb uefi_bootloader/uefi_bootloader.efi
+    gdb -x etc/gdb/qemu-debug.gdb
 
-In both qemu and gdb we invoke the boot loader itself, without debug symbols.
-
-In the gdb shell, run
-
-    (gdb) info files
-    Symbols from "/path/to/uefi_bootloader/uefi_bootloader.efi".
-    Local exec file:
-        `/path/to/uefi_bootloader/uefi_bootloader.efi', file type pei-x86-64.
-        Entry point: 0x3000
-        0x0000000000001000 - 0x0000000000002a70 is .eh_frame
-        0x0000000000003000 - 0x0000000000007f08 is .text
-        0x0000000000008000 - 0x000000000000800a is .reloc
-        0x0000000000009000 - 0x000000000000ab70 is .data
-        0x000000000000b000 - 0x000000000000b0f0 is .dynamic
-        0x000000000000c000 - 0x000000000000cd08 is .rela
-        0x000000000000d000 - 0x000000000000e4a0 is .dynsym
-
-This lists section info for the boot loader. Then run:
-
-    (gdb) add-symbol-file uefi_bootloader/uefi_bootloader-debug.efi 0x3EB9A000 -s .data 0x3EBA0000
-
-This lets gdb know about all the symbols in our boot loader, making it possible to set breakpoints by file name + line number and so on.
-
-If qemu loads the boot loader at 0x3EB97000 on your box, these numbers should be good. The formula is boot loader addr + .text offset for the first number, and boot loader addr + .data offset. The offset is in the output of "info files", the first column, in the table of addresses. For the data above, assuming boot loader at 0x3EB97000, the exact numbers are 0x3EB97000 + 0x0000000000003000 and 0x3EB97000 + 0x0000000000009000
-
-Run (still in gdb shell):
-
-    (gdb) set architecture i386:x86-64:intel
-    (gdb) target remote :1234
-
-We're attached. You can set a break point if you want. At time of writing, this sets a breakpoint right before the boot loader invokes its infinite pause loop.
-
-    (gdb) break uefi_bootloader.c:236
-
-Start execution
-
-    (gdb) continue
-
-When we reach the breakpoint, you can run x/4xb 0x000000. This should print the first 4 bytes of the actual kernel image, which is loaded into physical 0x000000.
+This sets up a gdb that connects to qemu for remote debugging. Type "continue" to make qemu continue loading.
 
 ## GCC
 
