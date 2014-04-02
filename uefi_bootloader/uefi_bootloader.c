@@ -1,5 +1,6 @@
 #include <efi.h>
 #include <efilib.h>
+#include <halt_elf.h>
 
 EFI_STATUS get_memory_map(EFI_SYSTEM_TABLE *systab, UINTN *size, EFI_MEMORY_DESCRIPTOR **map, UINTN *key, UINTN *descriptor_size, UINT32 *descriptor_version) {
   EFI_STATUS status = EFI_LOAD_ERROR;
@@ -158,6 +159,38 @@ static void merge_memory_map(EFI_MEMORY_DESCRIPTOR *memory_map, UINTN *memmap_si
 
 }
 
+static EFI_STATUS load_elf(void *dest, CHAR8 *data, UINTN size) {
+  halt_elf_header *elf_header = (halt_elf_header*)data;
+  if (elf_header->e_ident[halt_elf_ident_magic_0] != 0x7f
+      || elf_header->e_ident[halt_elf_ident_magic_1] != 'E'
+      || elf_header->e_ident[halt_elf_ident_magic_2] != 'L'
+      || elf_header->e_ident[halt_elf_ident_magic_3] != 'F') {
+    return EFI_LOAD_ERROR;
+  }
+
+  if (elf_header->e_ident[halt_elf_ident_class] != halt_elf_class_64) {
+    return EFI_LOAD_ERROR;
+  }
+
+  if (elf_header->e_ident[halt_elf_ident_endianness] != halt_elf_endianness_little) {
+    return EFI_LOAD_ERROR;
+  }
+
+  if (elf_header->e_ident[halt_elf_ident_os_abi] != halt_elf_os_abi_system_v) {
+    return EFI_LOAD_ERROR;
+  }
+
+  if (elf_header->e_ident[halt_elf_ident_version] != 1) {
+    return EFI_LOAD_ERROR;
+  }
+
+  if (elf_header->e_type != halt_elf_type_executable) {
+    return EFI_LOAD_ERROR;
+  }
+
+  return EFI_SUCCESS;
+}
+
 // We might fail the first time, due to ExitBootServices triggering callbacks
 // that alter the memory map. So we should only try twice.
 #define MAX_EXIT_BOOT_ATTEMPTS 2
@@ -229,7 +262,10 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
     return EFI_LOAD_ERROR;
   }
 
-  memcpy(0, halt_image_data, halt_image_size);
+  status = load_elf(0, halt_image_data, halt_image_size);
+  if (status != EFI_SUCCESS) {
+    return status;
+  }
 
   int wait = 1;
   while (wait) {
