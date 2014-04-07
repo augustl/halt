@@ -91,12 +91,9 @@ child_process.exec("gdb -nx --batch -ex 'info files' uefi_bootloader/uefi_bootlo
         gdbQueue.push(debugSymbolsCommand);
         gdbQueue.push("set architecture i386:x86-64:intel", function () {
             gdbQueue.push("target remote :1234");
-            setTimeout(function () {
-                gdbQueue.push("target remote :1234");
-                bootstrapGdbQueue.kill();
-                bootstrapGdb.kill();
-                process.stdin.pipe(gdb.stdin);
-            }, 100);
+            bootstrapGdbQueue.kill();
+            bootstrapGdb.kill();
+            process.stdin.pipe(gdb.stdin);
         });
     });
 })
