@@ -200,8 +200,6 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
   EFI_STATUS status;
   Print(L"This is HALT!\r\n");
 
-  print_current_memory_map(systab);
-
   EFI_LOADED_IMAGE *loaded_image;
   status = systab->BootServices->OpenProtocol(image, &LoadedImageProtocol, (void **)&loaded_image, image, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
   if (status != EFI_SUCCESS) {
@@ -221,7 +219,7 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
     return status;
   }
 
-  Print(L"Successfully located HALT kernel image (%ld bytes)\r\n", halt_image_size);
+  Print(L"Successfully located HALT kernel image (%ld bytes, addr 0x%lx)\r\n", halt_image_size, halt_image_location);
 
   int num_exit_boot_attempts = 0;
   EFI_MEMORY_DESCRIPTOR *memory_map = NULL;
