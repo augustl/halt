@@ -96,7 +96,6 @@ child_process.exec("gdb -nx --batch -ex 'info files' uefi_bootloader/uefi_bootlo
     bootstrapGdbQueue.push("file uefi_bootloader/uefi_bootloader.efi")
     bootstrapGdbQueue.push(debugSymbolsCommand);
     bootstrapGdbQueue.push("target remote :1234");
-    bootstrapGdbQueue.push("set architecture i386:x86-64:intel");
     bootstrapGdbQueue.push("break efi_main");
     bootstrapGdbQueue.push("continue", function () {
         var gdb = child_process.spawn("gdb", [], {});
