@@ -40,11 +40,11 @@ Run with
 
     QEMU_DEBUG_OPTIONS="-s -S" ./script/qemu
 
-In another tab, run
+In another tab, run (using Node.js)
 
-    gdb -x etc/gdb/qemu-debug.gdb
+    node etc/gdb/qemu-debug.js
 
-This sets up a gdb that connects to qemu for remote debugging. Type "continue" to make qemu continue loading.
+See the script for details. Some trickery is required for a proper 64 bit gdb connection to our uefi boot loader.
 
 ## GCC
 

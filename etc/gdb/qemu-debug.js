@@ -2,6 +2,23 @@
 var child_process = require("child_process");
 var BOOT_LOADER_ADDR = 0x3EB97000;
 
+/**
+ * Utility script for connecting a GDB to our uefi boot loader running in
+ * qemu.
+ *
+ * GDB is not fond of the CPU architecture changing. But qemu starts in 16
+ * bit and by the time the uefi bootloader runs, we're in 64 bit. So we'll
+ * get ugly errors instead of nice data output on break points and what not.
+ *
+ * This script first sets up a break point at efi_main, the boot loader
+ * entry point. When this break point hits, we get bogus data, but it did
+ * break properly. Then we connect a second gdb and set it to 64 bit,
+ * disconnect the first gdb, and voila. The second gdb works fine and we're
+ * still at the efi_main break point. We can now set additional break points
+ * and type 'continue' when we're ready, and get nice proper GDB in our
+ * boot loader.
+ */
+
 function numToHex(num) {
     return "0x" + num.toString(16).toUpperCase();
 }
