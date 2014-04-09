@@ -42,7 +42,7 @@ Run with
 
 In another tab, run (using Node.js)
 
-    node etc/gdb/qemu-debug.js
+    node etc/gdb/qemu-debug-halt.sh
 
 See the script for details. Some trickery is required for a proper 64 bit gdb connection to our uefi boot loader.
 
