@@ -83,9 +83,26 @@ function getOffset(lines, re) {
     return parseInt(lines.filter(function (l) { return re.test(l) })[0].trim().split(" ")[0], 16);
 }
 
-child_process.exec("gdb -nx --batch -ex 'info files' uefi_bootloader/uefi_bootloader.efi", {cwd: process.cwd()}, function (err, stdout, stderr) {
+function assoc(obj, key, val) { obj[key] = val; return obj; }
+function parseOptions(args, result) {
+    if (args.length === 0) { return result; }
+    var arg = args[0];
+    return (/^\-\-/.test(arg)) ? parseOptions(args.slice(2), assoc(result, arg, args[1])) : parseOptions(args.slice(1), result)
+}
+
+var parsedArgs = parseOptions(process.argv.slice(), {})
+var opts = {"--break": "efi_main", "--efi-app-debug": null, "--efi-app": null, "--gdb-port": "1234", "--arch": "i386:x86-64:intel"};
+for (var opt in opts) {
+    if (parsedArgs.hasOwnProperty(opt)) {
+        opts[opt] = parsedArgs[opt];
+    } else {
+        if (opts[opt] === null) { console.error("Option " + opt + " is required."); process.exit(1); }
+    }
+}
+
+child_process.exec("gdb -nx --batch -ex 'info files' " + opts["--efi-app"], {cwd: process.cwd()}, function (err, stdout, stderr) {
     var lines = stdout.split("\n");
-    var debugSymbolsCommand =  "add-symbol-file uefi_bootloader/uefi_bootloader-debug.efi "
+    var debugSymbolsCommand =  "add-symbol-file  " + opts["--efi-app-debug"] + " "
         + numToHex(BOOT_LOADER_ADDR + getOffset(lines, /\.text/))
         + " -s .data "
         + numToHex(BOOT_LOADER_ADDR + getOffset(lines, /\.data/))
@@ -93,20 +110,20 @@ child_process.exec("gdb -nx --batch -ex 'info files' uefi_bootloader/uefi_bootlo
     var bootstrapGdb = child_process.spawn("gdb", [], {});
     var bootstrapGdbQueue = createGdbQueue(bootstrapGdb);
 
-    bootstrapGdbQueue.push("file uefi_bootloader/uefi_bootloader.efi")
+    bootstrapGdbQueue.push("file " + opts["--efi-app"])
     bootstrapGdbQueue.push(debugSymbolsCommand);
-    bootstrapGdbQueue.push("target remote :1234");
-    bootstrapGdbQueue.push("break efi_main");
+    bootstrapGdbQueue.push("target remote :" + opts["--gdb-port"]);
+    bootstrapGdbQueue.push("break " + opts["--break"]);
     bootstrapGdbQueue.push("continue", function () {
         var gdb = child_process.spawn("gdb", [], {});
         gdb.stdout.pipe(process.stdout);
         gdb.stderr.pipe(process.stderr);
 
         var gdbQueue = createGdbQueue(gdb);
-        gdbQueue.push("file uefi_bootloader/uefi_bootloader.efi")
+        gdbQueue.push("file " + opts["--efi-app"])
         gdbQueue.push(debugSymbolsCommand);
-        gdbQueue.push("set architecture i386:x86-64:intel", function () {
-            gdbQueue.push("target remote :1234");
+        gdbQueue.push("set architecture " + opts["--arch"], function () {
+            gdbQueue.push("target remote :" + opts["--gdb-port"]);
             bootstrapGdbQueue.kill();
             bootstrapGdb.kill();
             process.stdin.pipe(gdb.stdin);
