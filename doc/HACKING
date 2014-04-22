@@ -31,10 +31,9 @@ Run with
 
 Based heavily on http://wiki.osdev.org/UEFI#Using_GNU_toolchain_for_compiling_and_debugging_EFI_applications
 
-First, create the debug boot loader.
+First, build normally. This will build everyting you need, including debug symbol file setc.
 
-    cd uefi_bootloader/
-    make debug
+    ./script/all
 
 Run with
 

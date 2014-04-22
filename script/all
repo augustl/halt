@@ -9,6 +9,7 @@ KERNEL_DIR="halt"
 
 cd uefi_bootloader
 make
+make debug
 cd ..
 mkdir -p target/mnt/$BOOTLOADER_DIR
 cp uefi_bootloader/uefi_bootloader.efi target/mnt/$BOOTLOADER_DIR/BOOTx64.EFI
