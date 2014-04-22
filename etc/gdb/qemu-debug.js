@@ -1,6 +1,5 @@
 "use strict";
 var child_process = require("child_process");
-var BOOT_LOADER_ADDR = 0x3EB97000;
 
 /**
  * Utility script for connecting a GDB to our uefi boot loader running in
@@ -91,7 +90,7 @@ function parseOptions(args, result) {
 }
 
 var parsedArgs = parseOptions(process.argv.slice(), {})
-var opts = {"--break": "efi_main", "--efi-app-debug": null, "--efi-app": null, "--gdb-port": "1234", "--arch": "i386:x86-64:intel"};
+var opts = {"--break": "efi_main", "--efi-app-debug": null, "--efi-app": null, "--gdb-port": "1234", "--arch": "i386:x86-64:intel", "--boot-loader-addr": null};
 for (var opt in opts) {
     if (parsedArgs.hasOwnProperty(opt)) {
         opts[opt] = parsedArgs[opt];
@@ -102,10 +101,11 @@ for (var opt in opts) {
 
 child_process.exec("gdb -nx --batch -ex 'info files' " + opts["--efi-app"], {cwd: process.cwd()}, function (err, stdout, stderr) {
     var lines = stdout.split("\n");
+    var bootLoaderAddr = parseInt(opts["--boot-loader-addr"], 16);
     var debugSymbolsCommand =  "add-symbol-file  " + opts["--efi-app-debug"] + " "
-        + numToHex(BOOT_LOADER_ADDR + getOffset(lines, /\.text/))
+        + numToHex(bootLoaderAddr + getOffset(lines, /\.text/))
         + " -s .data "
-        + numToHex(BOOT_LOADER_ADDR + getOffset(lines, /\.data/))
+        + numToHex(bootLoaderAddr + getOffset(lines, /\.data/))
 
     var bootstrapGdb = child_process.spawn("gdb", [], {});
     var bootstrapGdbQueue = createGdbQueue(bootstrapGdb);
