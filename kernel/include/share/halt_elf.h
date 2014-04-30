@@ -38,6 +38,29 @@ enum halt_elf_ident {
   halt_elf_ident_pad = 9
 };
 
+typedef struct {
+  elf64_word_t sh_name;
+  elf64_word_t sh_type;
+  elf64_xword_t sh_flags;
+  elf64_addr_t sh_addr;
+  elf64_off_t sh_offset;
+  elf64_xword_t sh_size;
+  elf64_word_t sh_link;
+  elf64_word_t sh_info;
+  elf64_xword_t sh_addralign;
+  elf64_xword_t sh_entsize;
+} halt_elf_section_header;
+
+enum halt_elf_section_header_type {
+  halt_elf_section_header_type_null = 0,
+  halt_elf_section_header_type_progbits = 1,
+  halt_elf_section_header_type_symtab = 2,
+  halt_elf_section_header_type_strtab = 3,
+  halt_elf_section_header_type_rela = 4,
+  halt_elf_section_header_type_nobits = 8,
+  halt_elf_section_header_type_rel = 9
+};
+
 #define halt_elf_class_32 (1)
 #define halt_elf_class_64 (2)
 

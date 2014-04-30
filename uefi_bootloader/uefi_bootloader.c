@@ -159,8 +159,7 @@ static void merge_memory_map(EFI_MEMORY_DESCRIPTOR *memory_map, UINTN *memmap_si
 
 }
 
-static EFI_STATUS load_elf(void *dest, CHAR8 *data, UINTN size) {
-  halt_elf_header *elf_header = (halt_elf_header*)data;
+static EFI_STATUS elf_validate(halt_elf_header *elf_header) {
   if (elf_header->e_ident[halt_elf_ident_magic_0] != 0x7f
       || elf_header->e_ident[halt_elf_ident_magic_1] != 'E'
       || elf_header->e_ident[halt_elf_ident_magic_2] != 'L'
@@ -188,6 +187,34 @@ static EFI_STATUS load_elf(void *dest, CHAR8 *data, UINTN size) {
     return EFI_LOAD_ERROR;
   }
 
+  return EFI_SUCCESS;
+}
+
+static EFI_STATUS elf_perform_load(halt_elf_header *elf_header) {
+  int i;
+  halt_elf_section_header *section_headers = (halt_elf_section_header *)((void *)elf_header + elf_header->e_shoff);
+  for (i = 0; i < elf_header->e_shnum; i++) {
+    halt_elf_section_header *section_header = &section_headers[i];
+
+    if (section_header->sh_type == halt_elf_section_header_type_rel) {
+      // TODO: actually do something useful
+      continue;
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
+static EFI_STATUS load_elf(void *dest, CHAR8 *data, UINTN size) {
+  EFI_STATUS status;
+  halt_elf_header *elf_header = (halt_elf_header*)data;
+
+  status = elf_validate(elf_header);
+  if (status != EFI_SUCCESS) {
+    return status;
+  }
+
+  return elf_perform_load(elf_header);
   return EFI_SUCCESS;
 }
 
