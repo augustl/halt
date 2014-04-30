@@ -82,16 +82,3 @@ enum halt_elf_type {
   halt_elf_type_relocatable = 1,
   halt_elf_type_executable = 2
 };
-
-/* enum Elf_Ident { */
-/* 	EI_MAG0		= 0, // 0x7F */
-/* 	EI_MAG1		= 1, // 'E' */
-/* 	EI_MAG2		= 2, // 'L' */
-/* 	EI_MAG3		= 3, // 'F' */
-/* 	EI_CLASS	= 4, // Architecture (32/64) */
-/* 	EI_DATA		= 5, // Byte Order */
-/* 	EI_VERSION	= 6, // ELF Version */
-/* 	EI_OSABI	= 7, // OS Specific */
-/* 	EI_ABIVERSION	= 8, // OS Specific */
-/* 	EI_PAD		= 9  // Padding */
-/* }; */
