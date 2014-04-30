@@ -1,20 +1,28 @@
 #define ELF_NIDENT 16
 
+typedef uint64_t elf64_addr_t;
+typedef uint64_t elf64_off_t;
+typedef uint16_t elf64_half_t;
+typedef uint32_t elf64_word_t;
+typedef uint32_t elf64_sword_t;
+typedef uint64_t elf64_xword_t;
+typedef uint64_t elf64_sxword_t;
+
 typedef struct {
   uint8_t e_ident[ELF_NIDENT];
-  uint16_t e_type;
-  uint16_t e_machine;
-  uint32_t e_version;
-  uint32_t e_entry;
-  uint32_t e_phoff;
-  uint32_t e_shoff;
-  uint32_t e_flags;
-  uint16_t e_ehsize;
-  uint16_t e_phentsize;
-  uint16_t e_phnum;
-  uint16_t e_shentsize;
-  uint16_t e_shnum;
-  uint16_t e_shstrndx;
+  elf64_half_t e_type;
+  elf64_half_t e_machine;
+  elf64_word_t e_version;
+  elf64_addr_t e_entry;
+  elf64_off_t e_phoff;
+  elf64_off_t e_shoff;
+  elf64_word_t e_flags;
+  elf64_half_t e_ehsize;
+  elf64_half_t e_phentsize;
+  elf64_half_t e_phnum;
+  elf64_half_t e_shentsize;
+  elf64_half_t e_shnum;
+  elf64_half_t e_shstrndx;
 } halt_elf_header;
 
 enum halt_elf_ident {
