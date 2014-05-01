@@ -61,6 +61,17 @@ enum halt_elf_section_header_type {
   halt_elf_section_header_type_rel = 9
 };
 
+typedef struct {
+  elf64_word_t p_type;
+  elf64_word_t p_flags;
+  elf64_off_t p_offset;
+  elf64_addr_t p_vaddr;
+  elf64_addr_t p_paddr;
+  elf64_xword_t p_filez;
+  elf64_xword_t p_memsz;
+  elf64_xword_t p_align;
+} halt_elf_program_header;
+
 #define halt_elf_class_32 (1)
 #define halt_elf_class_64 (2)
 

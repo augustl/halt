@@ -192,11 +192,11 @@ static EFI_STATUS elf_validate(halt_elf_header *elf_header) {
 
 static EFI_STATUS elf_perform_load(halt_elf_header *elf_header) {
   int i;
-  halt_elf_section_header *section_headers = (halt_elf_section_header *)((void *)elf_header + elf_header->e_shoff);
-  for (i = 0; i < elf_header->e_shnum; i++) {
-    halt_elf_section_header *section_header = &section_headers[i];
+  halt_elf_program_header *program_headers = (halt_elf_program_header *)((void *)elf_header + elf_header->e_phoff);
+  for (i = 0; i < elf_header->e_phnum; i++) {
+    halt_elf_program_header *program_header = &program_headers[i];
 
-    if (section_header->sh_type == halt_elf_section_header_type_rel) {
+    if (program_header->p_type == 0) {
       // TODO: actually do something useful
       continue;
     }
