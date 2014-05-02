@@ -333,10 +333,9 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
     return status;
   }
 
-  int wait = 1;
-  while (wait) {
-    __asm__ __volatile__("pause");
-  }
+  __asm__ __volatile__("jmp %0"
+                       :
+                       :"r"(kernel_entry_point));
 
   return EFI_SUCCESS;
 }
