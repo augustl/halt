@@ -128,6 +128,13 @@ static void memcpy(void *dest, const void *src, UINTN count) {
   }
 }
 
+static void memset(void *s, int c, UINTN n) {
+  char *p = s;
+  while (n--) {
+    *p++ = c;
+  }
+}
+
 static int is_mergeable_type(UINT32 type) {
   return type == EfiBootServicesCode || type == EfiBootServicesData || type == EfiConventionalMemory;
 }
@@ -196,16 +203,31 @@ static EFI_STATUS elf_perform_load(halt_elf_header *elf_header) {
   for (i = 0; i < elf_header->e_phnum; i++) {
     halt_elf_program_header *program_header = &program_headers[i];
 
-    if (program_header->p_type == 0) {
-      // TODO: actually do something useful
-      continue;
+    memcpy((void *)program_header->p_vaddr, ((void *)elf_header + program_header->p_offset), program_header->p_filesz);
+    uint64_t remainder = program_header->p_memsz - program_header->p_filesz;
+    if (remainder > 0) {
+      memset((void *)program_header->p_vaddr + program_header->p_filesz, 0, remainder);
     }
   }
 
   return EFI_SUCCESS;
 }
 
-static EFI_STATUS load_elf(void *dest, CHAR8 *data, UINTN size) {
+static EFI_STATUS elf_get_entry_point(halt_elf_header *elf_header, uint64_t *entry_point) {
+  int i;
+  halt_elf_program_header *program_headers = (halt_elf_program_header *)((void *)elf_header + elf_header->e_phoff);
+  for (i = 0; i < elf_header->e_phnum; i++) {
+    halt_elf_program_header *program_header = &program_headers[i];
+    if (program_header->p_type == halt_elf_program_header_type_load) {
+      memcpy(entry_point, &program_header->p_vaddr, sizeof(uint64_t));
+      return EFI_SUCCESS;
+    }
+  }
+
+  return EFI_LOAD_ERROR;
+}
+
+static EFI_STATUS load_elf(void *dest, CHAR8 *data, UINTN size, uint64_t *entry_point) {
   EFI_STATUS status;
   halt_elf_header *elf_header = (halt_elf_header*)data;
 
@@ -214,8 +236,12 @@ static EFI_STATUS load_elf(void *dest, CHAR8 *data, UINTN size) {
     return status;
   }
 
+  status = elf_get_entry_point(elf_header, entry_point);
+  if (status != EFI_SUCCESS) {
+    return status;
+  }
+
   return elf_perform_load(elf_header);
-  return EFI_SUCCESS;
 }
 
 // We might fail the first time, due to ExitBootServices triggering callbacks
@@ -287,7 +313,8 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
     return EFI_LOAD_ERROR;
   }
 
-  status = load_elf(0, halt_image_data, halt_image_size);
+  uint64_t kernel_entry_point = 0;
+  status = load_elf(0, halt_image_data, halt_image_size, &kernel_entry_point);
   if (status != EFI_SUCCESS) {
     return status;
   }

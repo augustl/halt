@@ -67,10 +67,20 @@ typedef struct {
   elf64_off_t p_offset;
   elf64_addr_t p_vaddr;
   elf64_addr_t p_paddr;
-  elf64_xword_t p_filez;
+  elf64_xword_t p_filesz;
   elf64_xword_t p_memsz;
   elf64_xword_t p_align;
 } halt_elf_program_header;
+
+enum halt_elf_program_header_type {
+  halt_elf_program_header_type_null = 0,
+  halt_elf_program_header_type_load = 1,
+  halt_elf_program_header_type_dynamic = 2,
+  halt_elf_program_header_type_interp = 3,
+  halt_elf_program_header_type_note = 4,
+  halt_elf_program_header_type_shlib = 5,
+  halt_elf_program_header_type_phdr = 6
+};
 
 #define halt_elf_class_32 (1)
 #define halt_elf_class_64 (2)
