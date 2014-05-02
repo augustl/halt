@@ -4,4 +4,6 @@
 #include <stdint.h>
 
 void kernel_main() {
+  char *addr = 0;
+  *addr = 0x66;
 }
