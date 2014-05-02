@@ -5,8 +5,8 @@ _start:
         ; a suitable location in memory for the kernel stack. Then call
         ; kernel.
         ; mov esp, the_stack_location
-        ; extern kernel_main
-        ; call kernel_main
+        extern kernel_main
+        call kernel_main
         cli
 .hang:
         hlt

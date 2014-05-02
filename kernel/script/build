@@ -5,4 +5,4 @@ ARCH=x86_64
 mkdir -p target
 nasm -felf64 src/kernel_entry.asm -o target/kernel_entry.o
 gcc -c src/kernel_main.c -o target/kernel_main.o -std=gnu99 -ffreestanding -O2 -D$ARCH -Wall -Werror -Wextra
-gcc -T src/linker.ld -o target/kernel.elf -ffreestanding -O2 -nostdlib -D$ARCH target/kernel_entry.o target/kernel_main.o
+gcc -o target/kernel.elf -ffreestanding -O2 -nostdlib -D$ARCH target/kernel_entry.o target/kernel_main.o
