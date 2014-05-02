@@ -326,7 +326,7 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
   }
 
   UINTN first_segment_num_bytes = first_memmap_item->NumberOfPages * 4096;
-  UINTN halt_init_struct_size = 4096; // We don't yet know the actual size.
+  UINTN halt_init_struct_size = 1024; // We don't yet know the actual size.
   uint64_t kernel_entry_point = 0;
   status = load_elf(0, halt_image_data, halt_image_size, first_segment_num_bytes + halt_init_struct_size, &kernel_entry_point);
   if (status != EFI_SUCCESS) {
