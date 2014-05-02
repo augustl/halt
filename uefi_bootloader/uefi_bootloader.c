@@ -240,7 +240,7 @@ static EFI_STATUS elf_get_entry_point(halt_elf_header *elf_header, uint64_t *ent
   return EFI_LOAD_ERROR;
 }
 
-static EFI_STATUS load_elf(void *dest, CHAR8 *data, UINTN size, UINTN max_addr, uint64_t *entry_point) {
+static EFI_STATUS load_elf(void *dest, void *data, uint64_t size, uint64_t max_addr, uint64_t *entry_point) {
   EFI_STATUS status;
   halt_elf_header *elf_header = (halt_elf_header*)data;
 
