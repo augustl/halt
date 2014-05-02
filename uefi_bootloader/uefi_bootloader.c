@@ -240,7 +240,7 @@ static EFI_STATUS elf_get_entry_point(halt_elf_header *elf_header, uint64_t *ent
   return EFI_LOAD_ERROR;
 }
 
-static EFI_STATUS load_elf(void *dest, void *data, uint64_t size, uint64_t max_addr, uint64_t *entry_point) {
+static EFI_STATUS load_elf(void *data, uint64_t size, uint64_t max_addr, uint64_t *entry_point) {
   EFI_STATUS status;
   halt_elf_header *elf_header = (halt_elf_header*)data;
 
@@ -328,7 +328,7 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
   UINTN first_segment_num_bytes = first_memmap_item->NumberOfPages * 4096;
   UINTN halt_init_struct_size = 1024; // We don't yet know the actual size.
   uint64_t kernel_entry_point = 0;
-  status = load_elf(0, halt_image_data, halt_image_size, first_segment_num_bytes + halt_init_struct_size, &kernel_entry_point);
+  status = load_elf(halt_image_data, halt_image_size, first_segment_num_bytes + halt_init_struct_size, &kernel_entry_point);
   if (status != EFI_SUCCESS) {
     return status;
   }
