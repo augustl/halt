@@ -166,7 +166,7 @@ static void merge_memory_map(EFI_MEMORY_DESCRIPTOR *memory_map, UINTN *memmap_si
 
 }
 
-static EFI_STATUS elf_validate(halt_elf_header *elf_header) {
+static EFI_STATUS elf_validate_header(halt_elf_header *elf_header) {
   if (elf_header->e_ident[halt_elf_ident_magic_0] != 0x7f
       || elf_header->e_ident[halt_elf_ident_magic_1] != 'E'
       || elf_header->e_ident[halt_elf_ident_magic_2] != 'L'
@@ -213,6 +213,19 @@ static EFI_STATUS elf_perform_load(halt_elf_header *elf_header) {
   return EFI_SUCCESS;
 }
 
+static EFI_STATUS elf_validate_max_addr(halt_elf_header *elf_header, UINTN max_addr) {
+  int i;
+  halt_elf_program_header *program_headers = (halt_elf_program_header *)((void *)elf_header + elf_header->e_phoff);
+  for (i = 0; i < elf_header->e_phnum; i++) {
+    halt_elf_program_header *program_header = &program_headers[i];
+    if (program_header->p_vaddr + program_header->p_memsz > max_addr) {
+      return EFI_LOAD_ERROR;
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
 static EFI_STATUS elf_get_entry_point(halt_elf_header *elf_header, uint64_t *entry_point) {
   int i;
   halt_elf_program_header *program_headers = (halt_elf_program_header *)((void *)elf_header + elf_header->e_phoff);
@@ -227,11 +240,16 @@ static EFI_STATUS elf_get_entry_point(halt_elf_header *elf_header, uint64_t *ent
   return EFI_LOAD_ERROR;
 }
 
-static EFI_STATUS load_elf(void *dest, CHAR8 *data, UINTN size, uint64_t *entry_point) {
+static EFI_STATUS load_elf(void *dest, CHAR8 *data, UINTN size, UINTN max_addr, uint64_t *entry_point) {
   EFI_STATUS status;
   halt_elf_header *elf_header = (halt_elf_header*)data;
 
-  status = elf_validate(elf_header);
+  status = elf_validate_header(elf_header);
+  if (status != EFI_SUCCESS) {
+    return status;
+  }
+
+  status = elf_validate_max_addr(elf_header, max_addr);
   if (status != EFI_SUCCESS) {
     return status;
   }
@@ -309,12 +327,8 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
 
   UINTN first_segment_num_bytes = first_memmap_item->NumberOfPages * 4096;
   UINTN halt_init_struct_size = 4096; // We don't yet know the actual size.
-  if (first_segment_num_bytes < halt_image_size + halt_init_struct_size) {
-    return EFI_LOAD_ERROR;
-  }
-
   uint64_t kernel_entry_point = 0;
-  status = load_elf(0, halt_image_data, halt_image_size, &kernel_entry_point);
+  status = load_elf(0, halt_image_data, halt_image_size, first_segment_num_bytes + halt_init_struct_size, &kernel_entry_point);
   if (status != EFI_SUCCESS) {
     return status;
   }
