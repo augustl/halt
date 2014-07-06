@@ -19,7 +19,16 @@ stack_top:
 .global _start
 .type _start, @function
 _start:
+        /* Initialize stack */
 	movl $stack_top, %esp
+
+        /* Reset EFLAGS */
+        pushl $0
+        popf
+
+        /* Args for main function */
+        pushl %ebx
+        pushl %eax
 
 	call halt_multiboot_main
 
