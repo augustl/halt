@@ -8,12 +8,12 @@
 #define HALT_MMAP_MAX_ADDR_SIZE UINTPTR_MAX
 #define HALT_MMAP_MAX_SIZE 32
 
-// We assume that this funciton is ever called once and store the memmap statically so
-// we don't have to deal with the complexity of allocating memory for it.
 static halt_sys_t *static_halt_sys;
 static halt_mmap_ent_t *static_halt_mmap[HALT_MMAP_MAX_SIZE];
 static bool is_initialized = false;
 static halt_err_t create_sys_struct(multiboot_info_t *mbi, halt_sys_t **halt_sys_ptr) {
+  // Should only be called once - don't want to deal with correctly allocating
+  // memory at this early stage, so we use static variables to store the map.
   if (is_initialized) {
     return HALT_ERROR;
   }
