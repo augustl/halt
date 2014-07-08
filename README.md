@@ -2,7 +2,9 @@
 
 See this blog post for a conceptual overview: http://augustl.com/blog/2014/an_immutable_operating_system/
 
-Halt is a (work in progress) operating system. It's mostly a playground for now - I still learning C, assembly and other basics.
+Halt is a (work in progress) operating system, and very much a learning project. The goal is to have a proof of concept can run on qemu and at least my own PC.
+
+The name HALT is a retrofitted acronym. These definitions are subject to change in the future, whenever I come up with something that sounds cooler.
 
 * H: Hardware. We don't care about mechanical sympathy for a specific architecture.
 * A: Asynchronous. Blocking calls and threads is a horrible abstraction.
