@@ -6,7 +6,7 @@ Halt is a (work in progress) operating system, and very much a learning project.
 
 The name HALT is a retrofitted acronym. These definitions are subject to change in the future, whenever I come up with something that sounds cooler.
 
-* H: Hardware. We don't care about mechanical sympathy for a specific architecture.
+* H: Hardware. Or rather, the abstraction of it. We will deliberately prefer immutability over mechanical sympathy.
 * A: Asynchronous. Blocking calls and threads is a horrible abstraction.
 * L: Lisp. The system language.
 * T: Time. All values will be immutable, giving us a good time model.
