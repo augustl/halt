@@ -1,9 +1,0 @@
-#!/bin/sh
-
-. script/_env.sh
-
-mkdir -p target
-dd if=/dev/zero of=$TARGET_DISK bs=1M count=50
-parted $TARGET_DISK mklabel gpt
-parted -- $TARGET_DISK mkpart primary 1 -1
-mkdosfs -F 12 $TARGET_DISK

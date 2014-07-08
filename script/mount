@@ -1,6 +1,0 @@
-#!/bin/sh
-
-. script/_env.sh
-
-mkdir -p target/mnt
-sudo mount -o loop,flush,uid=1000 $TARGET_DISK target/mnt
