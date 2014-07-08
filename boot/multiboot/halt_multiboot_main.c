@@ -56,9 +56,6 @@ static halt_err_t create_sys_struct(multiboot_info_t *mbi, halt_sys_t **halt_sys
 }
 
 void halt_multiboot_main(unsigned long magic, unsigned long addr) {
-  int *point = (int *)0x20;
-  *point = 4;
-
   if (magic != MULTIBOOT_BOOTLOADER_MAGIC) {
     return;
   }
@@ -70,7 +67,5 @@ void halt_multiboot_main(unsigned long magic, unsigned long addr) {
     return;
   }
 
-  if (halt_sys->mmap_length == 0) {
-    return;
-  }
+  halt_main(halt_sys);
 }
