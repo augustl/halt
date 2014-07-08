@@ -1,50 +1,12 @@
 # Hacking on HALT
 
-First, make the virtual disk.
+You need GCC for i686-elf. As in, `gcc -v` needs to say "Target: i686-elf", not "Target: x86_64-linux-gnu" or whatever. I use ansible to compile a GCC for that target, you might find these scripts useful for your own compilation.
 
-    ./script/make_disk
+https://github.com/augustl/ansible-playbooks/blob/aa50f114e57b88c7b5cfdcf25d7dced26f24a210/ubuntu-halt.yml
+https://github.com/augustl/ansible-playbooks/blob/aa50f114e57b88c7b5cfdcf25d7dced26f24a210/roles/ubuntu-halt/tasks/main.yml
 
-Mount this disk in loop so that you can write to a plain folder to write to the disk.
+# Qemu
 
-    ./script/mount
+I test and run the os in qemu. You need qemu-system-i386 which should come by default with most qemu packages.
 
-Then, build and deploy the uefi bootloader and HALT.
-
-    ./script/all
-
-Use qemu to  boot it all up:
-
-    ./script/qemu_bios  # You only need to run it once
-    ./script/qemu
-
-Happy hacking!
-
-## Qemu
-
-In order to run the image with Qemu, use http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=OVMF. Rename OVMF.fd to bios.bin, and CirrusLogic5446.rom to vgabios-cirrus.bin. Put them both in qemu-bios.
-
-Run with
-
-    make qemu
-
-### GDB in qemu
-
-Based heavily on http://wiki.osdev.org/UEFI#Using_GNU_toolchain_for_compiling_and_debugging_EFI_applications
-
-First, build normally. This will build everyting you need, including debug symbol file setc.
-
-    ./script/all
-
-Run with
-
-    QEMU_DEBUG_OPTIONS="-s -S" ./script/qemu
-
-In another tab, run
-
-    sh etc/gdb/qemu-debug-halt.sh
-
-See the script for details. Some trickery is required for a proper 64 bit gdb connection to our uefi boot loader.
-
-## GCC
-
-There is a gotcha. You need gcc >= 4.7, otherwise the `-DGNU_EFI_USE_MS_ABI` flag won't work and the calls to BootServices will end up with errors.
+Build with sh script/build.sh. This creates the file `target/halt_multiboot.bin`. Use qemu's multiboot facilities to boot the OS.
