@@ -1,14 +1,14 @@
 #include <stdint.h>
 
 typedef struct {
-  uint32_t mmap_length;
-  uint32_t mmap_addr;
-} halt_sys_t;
+  uint32_t size;
+  uintptr_t addr;
+} halt_mmap_ent_t;
 
 typedef struct {
-  uint32_t size;
-  uint64_t addr;
-} halt_mmap_ent_t;
+  uint32_t mmap_length;
+  halt_mmap_ent_t *mmap;
+} halt_sys_t;
 
 
 typedef uint32_t halt_err_t;
