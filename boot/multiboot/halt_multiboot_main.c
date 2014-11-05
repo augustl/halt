@@ -29,10 +29,10 @@ static void sys_struct_set_mmap(multiboot_memory_map_t *mb_mmap_ary, uint32_t mb
     }
 
     ent->addr = mb_mmap->addr;
-    if (mb_mmap->addr + mb_mmap->size > UINTPTR_MAX) {
-      ent->size = mb_mmap->size - (mb_mmap->addr + mb_mmap->size - UINTPTR_MAX);
+    if (mb_mmap->addr + mb_mmap->len > UINTPTR_MAX) {
+      ent->size = mb_mmap->len - (mb_mmap->addr + mb_mmap->len - UINTPTR_MAX);
     } else {
-      ent->size = mb_mmap->size;
+      ent->size = mb_mmap->len;
     }
 
     ++ent;
