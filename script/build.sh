@@ -1,7 +1,7 @@
 # TODO: Make gcc location configurable
 BIN=$HOME/local/gcc-cross/bin
 GCCFLAGS_DEBUG="-Og -ggdb"
-GCCFLAGS="-std=gnu99 -nostdlib -ffreestanding -O2 -Wall -Wextra -Iinclude $GCCFLAGS_DEBUG"
+GCCFLAGS="-nostdlib -ffreestanding -Wall -Wextra -Iinclude $GCCFLAGS_DEBUG"
 rm -rf target
 mkdir -p target
 $BIN/i686-elf-as boot/multiboot/halt_multiboot_init.s -o target/halt_multiboot_init.o
