@@ -37,4 +37,13 @@ _start:
 .Lhang:
 	jmp .Lhang
 
+.global _enable_long_mode
+.type _enable_long_mode, @function
+_enable_long_mode:
+
+
+.global _jump_to_halt_main
+.type _jump_to_halt_main, @function
+_jump_to_halt_main:
+
 .size _start, . - _start
