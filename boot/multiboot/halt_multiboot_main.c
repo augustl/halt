@@ -90,7 +90,7 @@ void halt_multiboot_main(unsigned long magic, unsigned long addr) {
   multiboot_info_t *mbi = (multiboot_info_t *)addr;
   uint32_t mbi_mmap_length = mbi->mmap_length / sizeof(multiboot_memory_map_t);
 
-  if (magic == MULTIBOOT_BOOTLOADER_MAGIC) {
+  if (magic != MULTIBOOT_BOOTLOADER_MAGIC) {
     return;
   }
 
