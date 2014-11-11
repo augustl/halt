@@ -1,7 +1,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-
 #include <multiboot.h>
 #include <halt.h>
 #include <halt_tty.h>
