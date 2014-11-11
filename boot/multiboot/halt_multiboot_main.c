@@ -4,6 +4,7 @@
 
 #include <multiboot.h>
 #include <halt.h>
+#include <halt_tty.h>
 
 #define HALT_MMAP_MAX_ADDR_SIZE UINTPTR_MAX
 #define HALT_MMAP_MAX_SIZE 32
@@ -79,24 +80,30 @@ static halt_err_t kernel_main_mod_get(uint32_t mods_count, uint32_t mods_addr, m
   return HALT_ERROR;
 }
 
+void halt_multiboot_early() {
+  halt_tty_initialize();
+  halt_tty_puts("Initializing HALT...");
+}
+
 void halt_multiboot_main(unsigned long magic, unsigned long addr) {
   halt_err_t err;
   multiboot_module_t *kernel_main_mod;
-  halt_sys_t *halt_sys = static_halt_sys;
   multiboot_info_t *mbi = (multiboot_info_t *)addr;
   uint32_t mbi_mmap_length = mbi->mmap_length / sizeof(multiboot_memory_map_t);
 
-  if (magic != MULTIBOOT_BOOTLOADER_MAGIC) {
+  if (magic == MULTIBOOT_BOOTLOADER_MAGIC) {
     return;
   }
 
   err = kernel_main_mod_get(mbi->mods_count, mbi->mods_addr, &kernel_main_mod);
   if (err != HALT_SUCCESS) {
+    halt_tty_puts("ERROR: Could not find required multiboot module");
     return;
   }
 
-  err = halt_sys_set_mmap((multiboot_memory_map_t *)(intptr_t)mbi->mmap_addr, mbi_mmap_length, halt_sys);
+  err = halt_sys_set_mmap((multiboot_memory_map_t *)(intptr_t)mbi->mmap_addr, mbi_mmap_length, static_halt_sys);
   if (err != HALT_SUCCESS) {
+    halt_tty_puts("ERROR: Could not initialize memory map");
     return;
   }
 
