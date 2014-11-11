@@ -57,7 +57,7 @@ static halt_err_t sys_struct_create(multiboot_info_t *mbi, halt_sys_t **halt_sys
 
 static char *halt_multiboot_module_name = "halt.bin";
 static int halt_multiboot_module_name_length = sizeof(*halt_multiboot_module_name);
-static bool my_strcmp(char *a, char *b, int i) {
+static bool is_string_equals(char *a, char *b, int i) {
   while (i--) {
     if (a[i] != b[i]) {
       return false;
@@ -79,7 +79,7 @@ static halt_err_t kernel_main_mod_get(uint32_t mods_count, uint32_t mods_addr, m
 
   while (mods_count-- > 0) {
     cmdline = (char *)mod->cmdline;
-    if (my_strcmp(cmdline, halt_multiboot_module_name, halt_multiboot_module_name_length)) {
+    if (is_string_equals(cmdline, halt_multiboot_module_name, halt_multiboot_module_name_length)) {
       *result = (multiboot_module_t *)(intptr_t)mods_addr;
       return HALT_SUCCESS;
     }
