@@ -79,18 +79,17 @@ static halt_err_t kernel_main_mod_get(uint32_t mods_count, uint32_t mods_addr, m
   return HALT_ERROR;
 }
 
-void halt_multiboot_early() {
-  halt_tty_initialize();
-  halt_tty_puts("Initializing HALT...");
-}
-
 void halt_multiboot_main(unsigned long magic, unsigned long addr) {
   halt_err_t err;
   multiboot_module_t *kernel_main_mod;
   multiboot_info_t *mbi = (multiboot_info_t *)addr;
   uint32_t mbi_mmap_length = mbi->mmap_length / sizeof(multiboot_memory_map_t);
 
+  halt_tty_initialize();
+  halt_tty_puts("Initializing HALT...");
+
   if (magic != MULTIBOOT_BOOTLOADER_MAGIC) {
+    halt_tty_puts("ERROR: multiboot magic was wrong");
     return;
   }
 

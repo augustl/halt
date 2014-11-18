@@ -22,8 +22,6 @@ _start:
         /* Initialize stack */
 	movl $stack_top, %esp
 
-        call halt_multiboot_early
-
         /* Reset EFLAGS */
         pushl $0
         popf
