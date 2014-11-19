@@ -1,7 +1,7 @@
 # TODO: Make gcc location configurable
 BIN=$HOME/local/gcc-cross/bin
 GCCFLAGS_DEBUG="-Og -ggdb"
-GCCFLAGS="-nostdlib -ffreestanding -Wall -Wextra -Iinclude $GCCFLAGS_DEBUG"
+GCCFLAGS="-nostdlib -ffreestanding -Wall -Wextra -Iinclude -std=gnu11 $GCCFLAGS_DEBUG"
 GCCFLAGS64="-mcmodel=large -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -mno-sse3 -mno-3dnow $GCCFLAGS"
 rm -rf target/*
 mkdir -p target/boot
