@@ -1,0 +1,12 @@
+[package]
+name = "halt"
+version = "0.1.0"
+authors = ["August Lilleaas <august@augustl.com>"]
+
+[dependencies]
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
