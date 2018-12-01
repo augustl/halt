@@ -4,9 +4,8 @@ version = "0.1.0"
 authors = ["August Lilleaas <august@augustl.com>"]
 
 [dependencies]
+bootloader = "0.3.4"
 
-[profile.dev]
-panic = "abort"
 
-[profile.release]
-panic = "abort"
+[package.metadata.bootimage]
+default-target = "x86_64-os.json"
