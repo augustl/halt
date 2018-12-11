@@ -2,6 +2,7 @@
 name = "halt"
 version = "0.1.0"
 authors = ["August Lilleaas <august@augustl.com>"]
+edition = "2018"
 
 [dependencies]
 bootloader = "0.3.4"
