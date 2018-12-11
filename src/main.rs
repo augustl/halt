@@ -16,6 +16,8 @@ pub extern "C" fn _start() -> ! {
         }
     }
 
+    halt::interrupts::init_idt();
+
     loop {}
 }
 
