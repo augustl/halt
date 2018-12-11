@@ -1,1 +1,1 @@
-cargo xbuild --target .\x86_64_os.json
+cargo xbuild --target .\x86_64-os.json
