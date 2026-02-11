@@ -6,7 +6,7 @@ This document summarizes the project philosophy and contribution guidance, based
 
 ## Project Status
 
-HALT is intentionally experimental and early-stage. The current repository mostly contains low-level bootstrapping work (Rust `no_std`, basic entrypoint, VGA text output, and interrupt table setup), not a full implementation of the full architecture vision yet.
+HALT is intentionally experimental and early-stage. The current repository mostly contains low-level bootstrapping work and early build infrastructure, not a full implementation of the architecture vision yet.
 
 ## Core Design Goals
 

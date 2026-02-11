@@ -1,1 +1,0 @@
-cargo xbuild --target .\x86_64-os.json
