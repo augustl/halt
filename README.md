@@ -4,7 +4,9 @@ HALT is an operating system research project.
 
 ## Can I use HALT?
 
-It's nowhere near finished. I'm still figuring out the basics of how to boot a PC. I've never made an operating system or even a virtual machine or programming language.
+There are zero plans to make HALT be a big and professional operating system.
+
+It's nowhere near finished. I'm still figuring out the basics of how to boot a PC. I've never made an operating system or even a virtual machine or programming language. If you use this OS, you are crazy.
 
 ## Why does this repo have so many stars?
 
